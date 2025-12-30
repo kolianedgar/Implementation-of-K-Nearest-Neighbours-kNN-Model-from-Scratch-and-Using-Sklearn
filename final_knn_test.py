@@ -6,11 +6,10 @@ from data_loader import load_dataset
 from utils_own_knn import (
     grid_search_knn,
     cross_validate_knn,
-    print_cv_results,
     evaluate_on_dataset,
-    print_test_results,
 )
 from knn_classifier import *
+from utils_own_print import *
 
 # -------------------------------------------------
 # Dataset selection
