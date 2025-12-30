@@ -3,14 +3,14 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
 
-from knn_package_utils import (
-    load_dataset,
+from utils_evaluation import (
     grid_search_knn,
     cross_validate_knn,
-    evaluate_on_dataset,
-    print_cv_results,
-    print_test_results,
+    evaluate_on_dataset
 )
+
+from data_loader import load_dataset
+from utils_printing import *
 
 # -------------------------------------------------
 # Dataset selection
