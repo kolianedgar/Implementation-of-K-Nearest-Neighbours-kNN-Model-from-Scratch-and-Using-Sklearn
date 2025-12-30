@@ -1,85 +1,100 @@
-import os
-
-from sklearn.model_selection import (
-    GridSearchCV,
-    StratifiedKFold,
-    cross_validate
-)
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.pipeline import Pipeline
+import numpy as np
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
 
 from knn_package_utils import (
-    load_tabular_dataset,
-    build_scoring_dict,
-    summarize_cv_results
+    load_dataset,
+    grid_search_knn,
+    cross_validate_knn,
+    evaluate_on_dataset,
+    print_cv_results,
+    print_test_results,
 )
 
-# ------------------------------------------------
-# Load ANY dataset
-# ------------------------------------------------
-X, y = load_tabular_dataset(
-    path=os.getcwd() + "\Iris.csv",     # <-- your dataset
-    target_column="Species",      # <-- your label column
-    drop_columns=None            # optional
-)
+# -------------------------------------------------
+# Dataset selection
+# -------------------------------------------------
+DATASETS = [
+    {"source": "builtin", "name": "iris"},
+    {"source": "builtin", "name": "wine"},
+    {"source": "builtin", "name": "digits"},
+    # {"source": "csv", "filepath": "data/mydata.csv", "target_column": "label"},
+]
 
-# ------------------------------------------------
-# Pipeline
-# ------------------------------------------------
-pipeline = Pipeline([
-    ("scaler", StandardScaler()),
-    ("knn", KNeighborsClassifier())
-])
+for ds in DATASETS:
+    print("\n" + "#" * 70)
+    print("DATASET:", ds)
+    print("#" * 70)
 
-# ------------------------------------------------
-# Grid search
-# ------------------------------------------------
-param_grid = {
-    "knn__n_neighbors": list(range(3, 22, 2)),
-    "knn__weights": ["uniform", "distance"],
-    "knn__metric": ["minkowski"],
-    "knn__p": [1, 2]
-}
+    # -------------------------------------------------
+    # Load dataset
+    # -------------------------------------------------
+    X, y = load_dataset(**ds)
 
-grid = GridSearchCV(
-    estimator=pipeline,
-    param_grid=param_grid,
-    scoring="accuracy",
-    cv=5,
-    n_jobs=-1
-)
+    # -------------------------------------------------
+    # Train / test split
+    # -------------------------------------------------
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=0.2,
+        random_state=42,
+        stratify=y,
+    )
 
-grid.fit(X, y)
-best_model = grid.best_estimator_
+    # -------------------------------------------------
+    # Scaling (IMPORTANT for KNN)
+    # -------------------------------------------------
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
 
-print("Best parameters:")
-print(grid.best_params_)
-print()
+    # -------------------------------------------------
+    # Hyperparameter search (TRAINING SET ONLY)
+    # -------------------------------------------------
+    grid = grid_search_knn(
+        X_train,
+        y_train,
+        param_grid={
+            "n_neighbours": list(range(3, 22, 2)),
+            "weights": ["uniform", "distance"],
+            "distance_metric": ["euclidean", "manhattan"],
+        },
+        cv=5,
+    )
 
-# ------------------------------------------------
-# Cross-validated evaluation
-# ------------------------------------------------
-cv = StratifiedKFold(
-    n_splits=5,
-    shuffle=True,
-    random_state=42
-)
+    best_params = {
+        "n_neighbours": grid.best_params_["n_neighbors"],
+        "weights": grid.best_params_["weights"],
+        "distance_metric": grid.best_params_["metric"],
+    }
 
-cv_results = cross_validate(
-    estimator=best_model,
-    X=X,
-    y=y,
-    scoring=build_scoring_dict(),
-    cv=cv,
-    n_jobs=-1
-)
+    print("\nBest parameters:", best_params)
 
-# ------------------------------------------------
-# Results
-# ------------------------------------------------
-summary = summarize_cv_results(cv_results)
+    # -------------------------------------------------
+    # Cross-validation with best model (TRAINING SET)
+    # -------------------------------------------------
+    best_model = KNeighborsClassifier(**grid.best_params_)
 
-print("Cross-validated metrics (mean ± std):\n")
-for metric, (mean, std) in summary.items():
-    print(f"{metric}: {mean:.4f} ± {std:.4f}")
+    cv_results = cross_validate_knn(
+        model=best_model,
+        X=X_train,
+        y=y_train,
+        cv=5,
+    )
+
+    print_cv_results(cv_results, "CROSS-VALIDATION RESULTS")
+
+    # -------------------------------------------------
+    # Final test set evaluation
+    # -------------------------------------------------
+    best_model.fit(X_train, y_train)
+
+    test_results = evaluate_on_dataset(
+        model=best_model,
+        X=X_test,
+        y=y_test,
+    )
+
+    print_test_results(test_results)
