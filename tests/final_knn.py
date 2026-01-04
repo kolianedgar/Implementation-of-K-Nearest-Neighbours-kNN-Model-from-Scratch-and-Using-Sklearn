@@ -2,14 +2,14 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-from data_loader import load_dataset
-from utils_own_knn import (
+from knn.classifier import knn_classifier
+from knn.utils import (
     grid_search_knn,
     cross_validate_knn,
     evaluate_on_dataset,
 )
-from knn_classifier import *
-from utils_own_print import *
+from knn.data_loader import load_dataset
+from knn.reporting import *
 
 # -------------------------------------------------
 # Dataset selection
