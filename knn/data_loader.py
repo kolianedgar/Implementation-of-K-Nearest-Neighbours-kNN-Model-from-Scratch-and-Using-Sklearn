@@ -1,104 +1,79 @@
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
-from sklearn.datasets import (
-    load_iris,
-    load_wine,
-    load_breast_cancer,
-    load_digits,
-)
 
-# -------------------------------------------------
-# Built-in datasets
-# -------------------------------------------------
-def load_builtin_dataset(name):
-    name = name.lower()
-
-    if name == "iris":
-        X, y = load_iris(return_X_y=True)
-
-    elif name == "wine":
-        X, y = load_wine(return_X_y=True)
-
-    elif name == "breast_cancer":
-        X, y = load_breast_cancer(return_X_y=True)
-
-    elif name == "digits":
-        X, y = load_digits(return_X_y=True)
-
-    else:
-        raise ValueError(f"Unknown built-in dataset: {name}")
-
-    return np.asarray(X, dtype=float), np.asarray(y)
-
-
-# -------------------------------------------------
-# CSV / DATA datasets
-# -------------------------------------------------
 def load_csv_dataset(
     filepath,
     target_column,
     header="infer",
     drop_columns=None,
-    encode_features=False,
+    encode_features=True,
 ):
-    import pandas as pd
-    import numpy as np
-    from sklearn.preprocessing import LabelEncoder
+    """
+    Load a CSV dataset and convert categorical data to numeric.
+
+    Parameters
+    ----------
+    filepath : str or Path
+        Path to CSV file
+    target_column : int or str
+        Target column index or name
+    header : int or None
+        Row index for header (None if no header)
+    drop_columns : list[int | str], optional
+        Columns to drop before splitting X/y
+    encode_features : bool
+        Whether to label-encode categorical features
+
+    Returns
+    -------
+    X : np.ndarray
+        Numeric feature matrix
+    y : np.ndarray
+        Encoded target labels
+    """
 
     df = pd.read_csv(filepath, header=header)
 
     # ----------------------------
-    # Resolve target column
-    # ----------------------------
-    if isinstance(target_column, int):
-        if target_column < 0:
-            target_column = df.shape[1] + target_column
-        target_name = df.columns[target_column]
-    else:
-        target_name = target_column
-
-    if target_name not in df.columns:
-        raise ValueError(f"Target column '{target_name}' not found")
-
-    y = df[target_name]
-    X = df.drop(columns=[target_name])
-
-    # ----------------------------
-    # Drop non-feature columns
+    # Drop unwanted columns
     # ----------------------------
     if drop_columns is not None:
-        X = X.drop(columns=drop_columns)
+        df = df.drop(columns=drop_columns)
 
     # ----------------------------
-    # Encode features if needed
+    # Extract target
+    # ----------------------------
+    if isinstance(target_column, int):
+        y = df.iloc[:, target_column]
+        X = df.drop(df.columns[target_column], axis=1)
+    else:
+        y = df[target_column]
+        X = df.drop(columns=[target_column])
+
+    # ----------------------------
+    # Encode target labels
+    # ----------------------------
+    y = LabelEncoder().fit_transform(y)
+
+    # ----------------------------
+    # Encode categorical features
     # ----------------------------
     if encode_features:
         for col in X.columns:
-            if not np.issubdtype(X[col].dtype, np.number):
+            if X[col].dtype == object or pd.api.types.is_categorical_dtype(X[col]):
                 X[col] = LabelEncoder().fit_transform(X[col])
 
     # ----------------------------
-    # Encode target
+    # Convert to numpy
     # ----------------------------
-    if not np.issubdtype(y.dtype, np.number):
-        y = LabelEncoder().fit_transform(y)
-    else:
-        y = y.to_numpy()
+    X = X.to_numpy(dtype=float)
+    y = y.astype(int)
 
-    return X.to_numpy(dtype=float), np.asarray(y)
+    return X, y
 
-# -------------------------------------------------
-# Unified loader
-# -------------------------------------------------
-def load_dataset(
-    source,
-    *,
-    name=None,
-    filepath=None,
-    target_column=None,
-    **kwargs,
-):
+
+def load_dataset(source, **kwargs):
     """
     Unified dataset loader.
 
@@ -107,15 +82,25 @@ def load_dataset(
     source : {"builtin", "csv"}
     """
 
+    if source == "csv":
+        return load_csv_dataset(**kwargs)
+
     if source == "builtin":
-        if name is None:
-            raise ValueError("Built-in dataset requires 'name'")
-        return load_builtin_dataset(name)
+        from sklearn.datasets import (
+            load_iris,
+            load_wine,
+            load_digits,
+            load_breast_cancer,
+        )
 
-    elif source == "csv":
-        if filepath is None or target_column is None:
-            raise ValueError("CSV dataset requires filepath and target_column")
-        return load_csv_dataset(filepath, target_column, **kwargs)
+        loaders = {
+            "iris": load_iris,
+            "wine": load_wine,
+            "digits": load_digits,
+            "breast_cancer": load_breast_cancer,
+        }
 
-    else:
-        raise ValueError(f"Unknown dataset source: {source}")
+        data = loaders[kwargs["name"]]()
+        return data.data, data.target
+
+    raise ValueError(f"Unknown dataset source: {source}")
