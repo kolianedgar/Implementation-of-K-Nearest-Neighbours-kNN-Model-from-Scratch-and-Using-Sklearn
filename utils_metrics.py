@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
 from sklearn.metrics import roc_auc_score
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import GridSearchCV, StratifiedKFold
 
 def macro_recall(y_true, y_pred):
     classes = np.unique(y_true)
