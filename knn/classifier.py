@@ -1,6 +1,4 @@
-import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
-
 
 def knn_classifier(
     n_neighbours=5,

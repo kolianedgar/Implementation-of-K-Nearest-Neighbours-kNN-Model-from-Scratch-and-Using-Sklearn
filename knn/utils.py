@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
-from utils_metrics import *
+from .metrics import *
 
 def grid_search_knn(
     X,
