@@ -23,17 +23,15 @@ DATA_DIR = PROJECT_ROOT / "tests" / "data"
 # Dataset configurations
 # -------------------------------------------------
 DATASETS = [
-    # Fully categorical CSV (.data) dataset
     {
         "source": "csv",
-        "filepath": DATA_DIR / "zoo.data",
-        "target_column": -1,
-        "header": None,
+        "filepath": DATA_DIR / "zoo.csv",
+        "target_column": "class_type",
+        "header": 0,
         "encode_features": True,
-        "drop_columns": [0]
+        "drop_columns": ["animal_name"],
     },
 ]
-
 
 @pytest.mark.parametrize("dataset_config", DATASETS)
 def test_custom_knn_pipeline_execution(dataset_config):
@@ -45,7 +43,7 @@ def test_custom_knn_pipeline_execution(dataset_config):
     - preprocessing works
     - grid search runs
     - cross-validation runs
-    - final evaluation produces finite metrics
+    - final evaluation produces valid metrics
     """
 
     # -------------------------------------------------
@@ -72,7 +70,7 @@ def test_custom_knn_pipeline_execution(dataset_config):
     )
 
     # -------------------------------------------------
-    # Scaling (safe after encoding)
+    # Scaling (required for KNN)
     # -------------------------------------------------
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
@@ -96,7 +94,7 @@ def test_custom_knn_pipeline_execution(dataset_config):
     assert {"n_neighbours", "weights", "distance_metric"} <= best_params.keys()
 
     # -------------------------------------------------
-    # Cross-validation
+    # Cross-validation (custom KNN)
     # -------------------------------------------------
     cv_results = cross_validate_knn(
         model_factory=lambda: knn_classifier(**best_params),
@@ -119,15 +117,14 @@ def test_custom_knn_pipeline_execution(dataset_config):
 
     for metric, (mean, std) in cv_results.items():
         if metric == "macro_roc_auc":
-            # ROC AUC may be undefined in some CV folds
+            # May be undefined for some folds
             continue
-
         assert np.isfinite(mean)
         assert np.isfinite(std)
         assert std >= 0.0
 
     # -------------------------------------------------
-    # Final test evaluation
+    # Final evaluation on test set
     # -------------------------------------------------
     final_model = knn_classifier(**best_params)
     final_model.fit(X_train, y_train)
