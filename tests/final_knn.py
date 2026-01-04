@@ -2,6 +2,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
+from pathlib import Path
+
 from knn.classifier import knn_classifier
 from knn.utils import (
     grid_search_knn,
@@ -11,14 +13,21 @@ from knn.utils import (
 from knn.data_loader import load_dataset
 from knn.reporting import *
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_DIR = PROJECT_ROOT / "tests" / "data"
+
 # -------------------------------------------------
 # Dataset selection
 # -------------------------------------------------
 DATASETS = [
-    {"source": "builtin", "name": "iris"},
-    {"source": "builtin", "name": "wine"},
-    {"source": "builtin", "name": "digits"},
-    # {"source": "csv", "filepath": "data/mydata.csv", "target_column": "label"},
+    {
+        "source": "csv",
+        "filepath": DATA_DIR / "zoo.data",
+        "target_column": -1,
+        "header": None,
+        "encode_features": True,
+        "drop_columns": [0]
+    },
 ]
 
 for ds in DATASETS:

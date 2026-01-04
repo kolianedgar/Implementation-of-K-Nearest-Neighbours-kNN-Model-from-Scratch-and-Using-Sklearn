@@ -16,7 +16,7 @@ from knn.utils import (
 # Dataset configurations to test
 # -------------------------------------------------
 DATASETS = [
-    {"source": "builtin", "name": "iris"},
+    {"source": "builtin", "name": "breast_cancer"},
 ]
 
 

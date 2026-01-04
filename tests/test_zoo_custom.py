@@ -1,5 +1,6 @@
-import pytest
 import numpy as np
+import pytest
+from pathlib import Path
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -13,23 +14,37 @@ from knn.utils import (
 )
 
 # -------------------------------------------------
-# Dataset configurations to test
+# Paths
+# -------------------------------------------------
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_DIR = PROJECT_ROOT / "tests" / "data"
+
+# -------------------------------------------------
+# Dataset configurations
 # -------------------------------------------------
 DATASETS = [
-    {"source": "builtin", "name": "iris"},
+    # Fully categorical CSV (.data) dataset
+    {
+        "source": "csv",
+        "filepath": DATA_DIR / "zoo.data",
+        "target_column": -1,
+        "header": None,
+        "encode_features": True,
+        "drop_columns": [0]
+    },
 ]
 
 
 @pytest.mark.parametrize("dataset_config", DATASETS)
 def test_custom_knn_pipeline_execution(dataset_config):
     """
-    End-to-end execution test for custom KNN pipeline.
+    End-to-end execution test for the custom KNN pipeline.
 
     Verifies that:
     - datasets load correctly
-    - custom KNN can be fitted
-    - grid search executes
-    - cross-validation executes
+    - preprocessing works
+    - grid search runs
+    - cross-validation runs
     - final evaluation produces finite metrics
     """
 
@@ -40,8 +55,10 @@ def test_custom_knn_pipeline_execution(dataset_config):
 
     assert isinstance(X, np.ndarray)
     assert isinstance(y, np.ndarray)
+    assert X.ndim == 2
     assert len(X) == len(y)
     assert len(np.unique(y)) >= 2
+    assert np.issubdtype(X.dtype, np.number)
 
     # -------------------------------------------------
     # Train / test split
@@ -55,7 +72,7 @@ def test_custom_knn_pipeline_execution(dataset_config):
     )
 
     # -------------------------------------------------
-    # Scaling
+    # Scaling (safe after encoding)
     # -------------------------------------------------
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
@@ -76,28 +93,13 @@ def test_custom_knn_pipeline_execution(dataset_config):
     )
 
     assert isinstance(best_params, dict)
-    assert "n_neighbours" in best_params
-    assert "weights" in best_params
-    assert "distance_metric" in best_params
+    assert {"n_neighbours", "weights", "distance_metric"} <= best_params.keys()
 
     # -------------------------------------------------
     # Cross-validation
     # -------------------------------------------------
-    best_params = grid_search_knn(
-        X=X_train,
-        y=y_train,
-        param_grid={
-            "n_neighbours": [3, 5],
-            "weights": ["uniform", "distance"],
-            "distance_metric": ["euclidean", "manhattan"],
-        },
-        cv=3,
-    )
-
-    model = knn_classifier(**best_params)
-
     cv_results = cross_validate_knn(
-        model_factory = lambda: knn_classifier(**best_params),
+        model_factory=lambda: knn_classifier(**best_params),
         X=X_train,
         y=y_train,
         cv=3,
@@ -115,7 +117,11 @@ def test_custom_knn_pipeline_execution(dataset_config):
 
     assert expected_metrics.issubset(cv_results.keys())
 
-    for mean, std in cv_results.values():
+    for metric, (mean, std) in cv_results.items():
+        if metric == "macro_roc_auc":
+            # ROC AUC may be undefined in some CV folds
+            continue
+
         assert np.isfinite(mean)
         assert np.isfinite(std)
         assert std >= 0.0
@@ -134,5 +140,7 @@ def test_custom_knn_pipeline_execution(dataset_config):
 
     assert expected_metrics.issubset(test_results.keys())
 
-    for value in test_results.values():
+    for metric, value in test_results.items():
+        if metric == "macro_roc_auc":
+            continue
         assert np.isfinite(value)
