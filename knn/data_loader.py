@@ -38,37 +38,55 @@ def load_builtin_dataset(name):
 def load_csv_dataset(
     filepath,
     target_column,
-    *,
-    sep=",",
     header="infer",
     drop_columns=None,
-    encode_target=True,
-    encode_features=True,
+    encode_features=False,
 ):
-    df = pd.read_csv(filepath, sep=sep, header=header)
+    import pandas as pd
+    import numpy as np
+    from sklearn.preprocessing import LabelEncoder
 
-    # Target
-    y = df.iloc[:, target_column] if isinstance(target_column, int) else df[target_column]
+    df = pd.read_csv(filepath, header=header)
 
-    # Features
-    X = df.drop(df.columns[target_column], axis=1)
+    # ----------------------------
+    # Resolve target column
+    # ----------------------------
+    if isinstance(target_column, int):
+        if target_column < 0:
+            target_column = df.shape[1] + target_column
+        target_name = df.columns[target_column]
+    else:
+        target_name = target_column
 
+    if target_name not in df.columns:
+        raise ValueError(f"Target column '{target_name}' not found")
+
+    y = df[target_name]
+    X = df.drop(columns=[target_name])
+
+    # ----------------------------
+    # Drop non-feature columns
+    # ----------------------------
     if drop_columns is not None:
         X = X.drop(columns=drop_columns)
 
+    # ----------------------------
+    # Encode features if needed
+    # ----------------------------
+    if encode_features:
+        for col in X.columns:
+            if not np.issubdtype(X[col].dtype, np.number):
+                X[col] = LabelEncoder().fit_transform(X[col])
+
+    # ----------------------------
     # Encode target
-    if encode_target and not np.issubdtype(y.dtype, np.number):
+    # ----------------------------
+    if not np.issubdtype(y.dtype, np.number):
         y = LabelEncoder().fit_transform(y)
     else:
-        y = y.values
+        y = y.to_numpy()
 
-    # Encode features
-    if encode_features:
-        X = pd.get_dummies(X)
-    else:
-        X = X.values
-
-    return X.values.astype(float), y
+    return X.to_numpy(dtype=float), np.asarray(y)
 
 # -------------------------------------------------
 # Unified loader

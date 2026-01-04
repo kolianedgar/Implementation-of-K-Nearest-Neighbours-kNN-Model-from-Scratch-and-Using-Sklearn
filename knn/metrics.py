@@ -32,22 +32,86 @@ def macro_f1(y_true, y_pred):
     return np.mean(f1s)
 
 def macro_roc_auc(y_true, y_prob):
+    """
+    Robust macro ROC AUC for binary and multiclass classification.
+
+    Returns np.nan if ROC AUC is undefined (e.g. only one class present).
+    """
+
+    y_true = np.asarray(y_true)
+    y_prob = np.asarray(y_prob)
+
+    # If only one class present, ROC AUC is undefined
+    unique_classes = np.unique(y_true)
+    if unique_classes.size < 2:
+        return np.nan
+
     n_classes = y_prob.shape[1]
-    y_true_oh = np.eye(n_classes)[y_true]
-    return roc_auc_score(
-        y_true_oh,
-        y_prob,
-        average="macro",
-        multi_class="ovr"
-    )
+
+    # Ensure labels are in [0, n_classes - 1]
+    if y_true.max() >= n_classes:
+        return np.nan
+
+    # One-hot encode only valid classes
+    y_true_oh = np.zeros((y_true.size, n_classes))
+    y_true_oh[np.arange(y_true.size), y_true] = 1
+
+    try:
+        return roc_auc_score(
+            y_true_oh,
+            y_prob,
+            average="macro",
+            multi_class="ovr",
+        )
+    except ValueError:
+        return np.nan
 
 def categorical_cross_entropy(y_true, y_prob):
     eps = 1e-12
-    return -np.mean(np.log(y_prob[np.arange(len(y_true)), y_true] + eps))
+    y_true = np.asarray(y_true)
+    y_prob = np.asarray(y_prob)
+
+    n_classes = y_prob.shape[1]
+
+    # Keep only samples whose true class exists in this fold
+    valid_mask = y_true < n_classes
+
+    if not np.any(valid_mask):
+        return np.nan
+
+    return -np.mean(
+        np.log(
+            y_prob[np.arange(len(y_true))[valid_mask], y_true[valid_mask]] + eps
+        )
+    )
 
 def multiclass_brier_score(y_true, y_prob):
-    y_true_oh = np.eye(y_prob.shape[1])[y_true]
-    return np.mean(np.sum((y_prob - y_true_oh) ** 2, axis=1))
+    """
+    Robust multiclass Brier score.
+
+    Ignores samples whose true class is not present
+    in the model's probability output.
+    """
+
+    y_true = np.asarray(y_true)
+    y_prob = np.asarray(y_prob)
+
+    n_classes = y_prob.shape[1]
+
+    # Keep only samples whose true class exists in this fold
+    valid_mask = y_true < n_classes
+
+    if not np.any(valid_mask):
+        return np.nan
+
+    y_true_valid = y_true[valid_mask]
+    y_prob_valid = y_prob[valid_mask]
+
+    # One-hot encode only valid labels
+    y_true_oh = np.zeros_like(y_prob_valid)
+    y_true_oh[np.arange(len(y_true_valid)), y_true_valid] = 1.0
+
+    return np.mean(np.sum((y_prob_valid - y_true_oh) ** 2, axis=1))
 
 def expected_calibration_error(y_true, y_prob, n_bins=10):
     confidences = np.max(y_prob, axis=1)

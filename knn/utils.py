@@ -1,90 +1,45 @@
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
-from .metrics import *
+from knn.metrics import *
 
-def grid_search_knn(
-    X,
-    y,
-    param_grid,
-    cv=5,
-    random_state=42,
-):
-    """
-    Performs sklearn GridSearchCV for KNN.
-
-    Parameters
-    ----------
-    X : np.ndarray
-        Training features
-    y : np.ndarray
-        Training labels
-    param_grid : dict
-        Hyperparameter grid with keys:
-        - n_neighbours
-        - weights
-        - distance_metric
-    cv : int
-        Number of CV folds
-    random_state : int
-        Random seed for reproducibility
-
-    Returns
-    -------
-    grid : GridSearchCV
-        Fitted GridSearchCV object
-    """
-
-    knn = KNeighborsClassifier()
+def grid_search_knn(X, y, param_grid, cv=5):
 
     cv_strategy = StratifiedKFold(
         n_splits=cv,
         shuffle=True,
-        random_state=random_state,
+        random_state=42,
     )
 
-    sklearn_param_grid = {
-        "n_neighbors": param_grid["n_neighbours"],
-        "weights": param_grid["weights"],
-        "metric": param_grid["distance_metric"],
-    }
-
-    grid = GridSearchCV(
-        estimator=knn,
-        param_grid=sklearn_param_grid,
+    gs = GridSearchCV(
+        estimator=KNeighborsClassifier(),
+        param_grid={
+            "n_neighbors": param_grid["n_neighbours"],
+            "weights": param_grid["weights"],
+            "metric": param_grid["distance_metric"],
+        },
         scoring="f1_macro",
         cv=cv_strategy,
         n_jobs=-1,
-        refit=True,
-        return_train_score=False,
     )
 
-    grid.fit(X, y)
+    gs.fit(X, y)
 
-    return grid
+    # 🔑 THIS IS THE FIX
+    return {
+        "n_neighbours": gs.best_params_["n_neighbors"],
+        "weights": gs.best_params_["weights"],
+        "distance_metric": gs.best_params_["metric"],
+    }
 
-def cross_validate_knn(model, X, y, cv=5, random_state=42):
-    """
-    Cross-validate a sklearn KNN model using custom metrics.
+def cross_validate_knn(model_factory, X, y, cv=5):
 
-    Parameters
-    ----------
-    model : sklearn estimator
-        Unfitted KNeighborsClassifier instance
-    X : np.ndarray
-        Feature matrix
-    y : np.ndarray
-        Target labels
-    cv : int
-        Number of CV folds
-    random_state : int
-        Random seed for reproducibility
+    skf = StratifiedKFold(
+        n_splits=cv,
+        shuffle=True,
+        random_state=42,
+    )
 
-    Returns
-    -------
-    dict
-        Metric name -> (mean, std)
-    """
     metrics = {
         "macro_f1": [],
         "macro_recall": [],
@@ -95,35 +50,35 @@ def cross_validate_knn(model, X, y, cv=5, random_state=42):
         "ece": [],
     }
 
-    skf = StratifiedKFold(
-        n_splits=cv,
-        shuffle=True,
-        random_state=random_state,
-    )
-
     for train_idx, val_idx in skf.split(X, y):
-        # Refit model on each fold
-        model.fit(X[train_idx], y[train_idx])
+        X_train, X_val = X[train_idx], X[val_idx]
+        y_train, y_val = y[train_idx], y[val_idx]
 
-        y_pred = model.predict(X[val_idx])
-        y_prob = model.predict_proba(X[val_idx])
+        model = model_factory()
+        model.fit(X_train, y_train)
 
-        metrics["macro_f1"].append(macro_f1(y[val_idx], y_pred))
-        metrics["macro_recall"].append(macro_recall(y[val_idx], y_pred))
-        metrics["macro_sensitivity"].append(macro_sensitivity(y[val_idx], y_pred))
-        metrics["macro_roc_auc"].append(macro_roc_auc(y[val_idx], y_prob))
-        metrics["cross_entropy"].append(
-            categorical_cross_entropy(y[val_idx], y_prob)
-        )
-        metrics["brier"].append(
-            multiclass_brier_score(y[val_idx], y_prob)
-        )
-        metrics["ece"].append(
-            expected_calibration_error(y[val_idx], y_prob)
-        )
+        y_pred = model.predict(X_val)
+
+        if hasattr(model, "predict_proba"):
+            y_proba = model.predict_proba(X_val)
+        else:
+            y_proba = None
+
+        metrics["macro_f1"].append(macro_f1(y_val, y_pred))
+        metrics["macro_recall"].append(macro_recall(y_val, y_pred))
+        metrics["macro_sensitivity"].append(macro_sensitivity(y_val, y_pred))
+        value = macro_roc_auc(y_val, y_proba)
+        if not np.isnan(value):
+            metrics["macro_roc_auc"].append(value)
+        metrics["cross_entropy"].append(categorical_cross_entropy(y_val, y_proba))
+        metrics["brier"].append(multiclass_brier_score(y_val, y_proba))
+        metrics["ece"].append(expected_calibration_error(y_val, y_proba))
 
     return {
-        metric: (np.mean(values), np.std(values))
+        metric: (
+            np.mean(values) if len(values) > 0 else np.nan,
+            np.std(values) if len(values) > 0 else np.nan,
+        )
         for metric, values in metrics.items()
     }
 
