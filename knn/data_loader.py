@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
-
 from sklearn.datasets import (
     load_iris,
     load_wine,
@@ -9,6 +8,10 @@ from sklearn.datasets import (
     load_digits,
 )
 
+
+# -------------------------------------------------
+# Built-in datasets
+# -------------------------------------------------
 def load_builtin_dataset(name):
     name = name.lower()
 
@@ -27,45 +30,66 @@ def load_builtin_dataset(name):
     else:
         raise ValueError(f"Unknown built-in dataset: {name}")
 
-    return np.asarray(X), np.asarray(y)
+    return np.asarray(X, dtype=float), np.asarray(y)
 
+
+# -------------------------------------------------
+# CSV / DATA datasets
+# -------------------------------------------------
 def load_csv_dataset(
     filepath,
     target_column,
+    *,
+    sep=",",
+    header="infer",
     drop_columns=None,
-    encoding=True,
+    encode_target=True,
+    encode_features=True,
 ):
-    df = pd.read_csv(filepath)
+    df = pd.read_csv(filepath, sep=sep, header=header)
 
-    if target_column not in df.columns:
-        raise ValueError(f"Target column '{target_column}' not found")
+    # Target
+    y = df.iloc[:, target_column] if isinstance(target_column, int) else df[target_column]
 
-    y = df[target_column]
-    X = df.drop(columns=[target_column])
+    # Features
+    X = df.drop(df.columns[target_column], axis=1)
 
     if drop_columns is not None:
         X = X.drop(columns=drop_columns)
 
-    # Convert to numpy
-    X = X.values
-
-    # Encode target if needed
-    if encoding and not np.issubdtype(y.dtype, np.number):
-        le = LabelEncoder()
-        y = le.fit_transform(y)
+    # Encode target
+    if encode_target and not np.issubdtype(y.dtype, np.number):
+        y = LabelEncoder().fit_transform(y)
     else:
         y = y.values
 
-    return X, y
+    # Encode features
+    if encode_features:
+        X = pd.get_dummies(X)
+    else:
+        X = X.values
 
+    return X.values.astype(float), y
+
+# -------------------------------------------------
+# Unified loader
+# -------------------------------------------------
 def load_dataset(
     source,
     *,
     name=None,
     filepath=None,
     target_column=None,
-    **kwargs
+    **kwargs,
 ):
+    """
+    Unified dataset loader.
+
+    Parameters
+    ----------
+    source : {"builtin", "csv"}
+    """
+
     if source == "builtin":
         if name is None:
             raise ValueError("Built-in dataset requires 'name'")
