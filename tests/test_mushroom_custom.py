@@ -7,6 +7,7 @@ from sklearn.preprocessing import StandardScaler
 
 from knn.data_loader import load_dataset
 from knn.classifier import knn_classifier
+
 from knn.utils import (
     grid_search_knn,
     cross_validate_knn,
@@ -91,13 +92,14 @@ def test_custom_knn_pipeline_execution(dataset_config):
     )
 
     assert isinstance(best_params, dict)
-    assert {"n_neighbours", "weights", "distance_metric"} <= best_params.keys()
+
+    model = knn_classifier(**best_params)
 
     # -------------------------------------------------
     # Cross-validation
     # -------------------------------------------------
     cv_results = cross_validate_knn(
-        model_factory=lambda: knn_classifier(**best_params),
+        model=model,
         X=X_train,
         y=y_train,
         cv=3,

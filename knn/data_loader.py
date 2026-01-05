@@ -61,7 +61,7 @@ def load_csv_dataset(
     # ----------------------------
     if encode_features:
         for col in X.columns:
-            if X[col].dtype == object or pd.api.types.is_categorical_dtype(X[col]):
+            if X[col].dtype == object or isinstance(X[col], pd.CategoricalDtype):
                 X[col] = LabelEncoder().fit_transform(X[col])
 
     # ----------------------------

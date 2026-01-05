@@ -3,7 +3,8 @@ import numpy as np
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.neighbors import KNeighborsClassifier
+
+from knn.classifier import knn_classifier
 
 from knn.data_loader import load_dataset
 from knn.utils import (
@@ -62,9 +63,9 @@ def test_package_knn_pipeline_execution(dataset_config):
     X_test = scaler.transform(X_test)
 
     # -------------------------------------------------
-    # Grid search (sklearn KNN)
+    # Grid search (custom KNN)
     # -------------------------------------------------
-    grid = grid_search_knn(
+    best_params = grid_search_knn(
         X=X_train,
         y=y_train,
         param_grid={
@@ -75,15 +76,15 @@ def test_package_knn_pipeline_execution(dataset_config):
         cv=3,
     )
 
-    assert hasattr(grid, "best_params_")
+    assert isinstance(best_params, dict)
 
-    best_model = KNeighborsClassifier(**grid.best_params_)
+    model = knn_classifier(**best_params)
 
     # -------------------------------------------------
     # Cross-validation
     # -------------------------------------------------
     cv_results = cross_validate_knn(
-        model=best_model,
+        model=model,
         X=X_train,
         y=y_train,
         cv=3,
@@ -111,10 +112,11 @@ def test_package_knn_pipeline_execution(dataset_config):
     # -------------------------------------------------
     # Final test evaluation
     # -------------------------------------------------
-    best_model.fit(X_train, y_train)
+    final_model = knn_classifier(**best_params)
+    final_model.fit(X_train, y_train)
 
     test_results = evaluate_on_dataset(
-        model=best_model,
+        model=final_model,
         X=X_test,
         y=y_test,
     )
