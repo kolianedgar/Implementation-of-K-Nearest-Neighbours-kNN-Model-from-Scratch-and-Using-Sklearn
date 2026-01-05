@@ -1,0 +1,7 @@
+# Python cache
+__pycache__/
+knn/__pycache__/
+
+# Test cache
+tests/__pycache__/
+.pytest_cache/
