@@ -1,0 +1,24 @@
+===================== test session starts =====================
+platform win32 -- Python 3.11.9, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Users\kolia\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\Scripts\LZSCC.461 Test
+configfile: pyproject.toml
+plugins: anyio-4.4.0, langsmith-0.4.10
+collected 6 items
+
+tests\test_cancer.py .                                   [ 16%]
+tests\test_digits.py .                                   [ 33%]
+tests\test_iris.py .                                     [ 50%]
+tests\test_mushrooms_custom.py .                         [ 66%]
+tests\test_wine.py .                                     [ 83%]
+tests\test_zoo_custom.py .                               [100%]
+
+====================== warnings summary =======================
+tests/test_zoo_custom.py::test_custom_knn_pipeline_execution[dataset_config0]
+tests/test_zoo_custom.py::test_custom_knn_pipeline_execution[dataset_config0]
+tests/test_zoo_custom.py::test_custom_knn_pipeline_execution[dataset_config0]
+tests/test_zoo_custom.py::test_custom_knn_pipeline_execution[dataset_config0]
+  C:\Users\kolia\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sklearn\metrics\_ranking.py:424: UndefinedMetricWarning: Only one class is present in y_true. ROC AUC score is not defined in that case.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============== 6 passed, 4 warnings in 31.41s ================
