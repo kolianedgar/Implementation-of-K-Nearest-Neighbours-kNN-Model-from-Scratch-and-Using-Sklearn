@@ -14,29 +14,6 @@ categorical_cross_entropy_package <- c(0.113787, 0.069276, 0.282578, 0.536039, -
 multiclass_brier_package <- c(0.081481, 0.030612, 0.047334, 0.068226, 0.000000, 0.064417)
 ece_package <- c(0.011111, 0.059524, 0.026812, 0.032164, 0.000000, 0.110333)
 
-diff_f1 <- macro_avg_f1_own - macro_avg_f1_package
-diff_recall <- macro_avg_recall_own - macro_avg_recall_package
-diff_sensitivity <- macro_avg_sensitivity_own - macro_avg_sensitivity_package
-diff_roc_auc <- macro_avg_roc_auc_own - macro_avg_roc_auc_package
-diff_cross_entropy <- categorical_cross_entropy_package - categorical_cross_entropy_own
-diff_brier <- multiclass_brier_package - multiclass_brier_own
-diff_ece <- ece_package - ece_own
-
-exact_paired_permutation_test <- function(diffs, statistic = mean) {
-  n <- length(diffs)
-  
-  signs <- expand.grid(rep(list(c(-1, 1)), n))
-  perm_stats <- apply(signs, 1, function(s) statistic(s * diffs))
-  
-  observed_stat <- statistic(diffs)
-  p_value <- mean(perm_stats >= observed_stat)
-  
-  list(
-    statistic = observed_stat,
-    p_value = p_value
-  )
-}
-
 own <- list(
   f1 = macro_avg_f1_own,
   recall = macro_avg_recall_own,
@@ -67,31 +44,39 @@ metric_direction <- c(
   ece = "lower"
 )
 
-results <- lapply(names(own), function(metric) {
+wilcox_results <- lapply(names(own), function(metric) {
   
   if (metric_direction[metric] == "higher") {
-    diffs <- own[[metric]] - package[[metric]]
+    x <- package[[metric]]
+    y <- own[[metric]]
   } else {
-    diffs <- package[[metric]] - own[[metric]]
+    x <- own[[metric]]
+    y <- package[[metric]]
   }
   
-  perm <- exact_paired_permutation_test(diffs)
+  res <- wilcox.test(
+    x,
+    y,
+    paired = TRUE,
+    alternative = "greater",
+    exact = TRUE
+  )
   
   data.frame(
     metric = metric,
-    statistic = perm$statistic,
-    p_value = perm$p_value
+    statistic_V = unname(res$statistic),
+    p_value = res$p.value
   )
 })
 
-results_df <- do.call(rbind, results)
+wilcox_df <- do.call(rbind, wilcox_results)
 
 if (requireNamespace("rstudioapi", quietly = TRUE)) {
   setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 }
 
 write.csv(
-  results_df,
-  file = file.path(getwd(), "knn_exact_permutation_results_testing.csv"),
+  wilcox_df,
+  file = file.path(getwd(), "knn_wilcoxon_results_testing.csv"),
   row.names = FALSE
 )
