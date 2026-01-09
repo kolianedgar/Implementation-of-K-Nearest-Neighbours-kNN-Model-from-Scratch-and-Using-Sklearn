@@ -1,0 +1,376 @@
+######################################################################
+DATASET: {'source': 'builtin', 'name': 'iris'}
+######################################################################
+
+Best parameters: {'n_neighbours': 3, 'weights': 'uniform', 'distance_metric': 'euclidean'}
+
+============================================================
+CROSS-VALIDATION RESULTS
+============================================================
+macro_f1                      : 0.951055 ± 0.039201
+macro_recall                  : 0.965714 ± 0.022416
+macro_sensitivity             : 0.965714 ± 0.022416
+macro_roc_auc                 : 0.982440 ± 0.012154
+cross_entropy                 : 0.763148 ± 0.571647
+brier                         : 0.094444 ± 0.051520
+ece                           : 0.058333 ± 0.042492
+
+============================================================
+FINAL TEST SET RESULTS
+============================================================
+macro_f1                      : 0.932660
+macro_recall                  : 0.933333
+macro_sensitivity             : 0.933333
+macro_roc_auc                 : 0.993333
+cross_entropy                 : 0.113787
+brier                         : 0.081481
+ece                           : 0.011111
+
+######################################################################
+DATASET: {'source': 'builtin', 'name': 'wine'}
+######################################################################
+
+Best parameters: {'n_neighbours': 9, 'weights': 'distance', 'distance_metric': 'manhattan'}
+
+============================================================
+CROSS-VALIDATION RESULTS
+============================================================
+macro_f1                      : 0.986078 ± 0.027843
+macro_recall                  : 0.989744 ± 0.020513
+macro_sensitivity             : 0.989744 ± 0.020513
+macro_roc_auc                 : 1.000000 ± 0.000000
+cross_entropy                 : 0.089943 ± 0.040494
+brier                         : 0.049207 ± 0.033111
+ece                           : 0.058439 ± 0.013573
+
+============================================================
+FINAL TEST SET RESULTS
+============================================================
+macro_f1                      : 1.000000
+macro_recall                  : 1.000000
+macro_sensitivity             : 1.000000
+macro_roc_auc                 : 1.000000
+cross_entropy                 : 0.078654
+brier                         : 0.036711
+ece                           : 0.066801
+
+######################################################################
+DATASET: {'source': 'builtin', 'name': 'digits'}
+######################################################################
+
+Best parameters: {'n_neighbours': 5, 'weights': 'uniform', 'distance_metric': 'euclidean'}
+
+============================================================
+CROSS-VALIDATION RESULTS
+============================================================
+macro_f1                      : 0.977876 ± 0.008305
+macro_recall                  : 0.978408 ± 0.008689
+macro_sensitivity             : 0.978408 ± 0.008689
+macro_roc_auc                 : 0.997467 ± 0.001385
+cross_entropy                 : 0.183176 ± 0.077804
+brier                         : 0.045938 ± 0.010979
+ece                           : 0.025059 ± 0.004735
+
+============================================================
+FINAL TEST SET RESULTS
+============================================================
+macro_f1                      : 0.966143
+macro_recall                  : 0.966424
+macro_sensitivity             : 0.966424
+macro_roc_auc                 : 0.995024
+cross_entropy                 : 0.283232
+brier                         : 0.048000
+ece                           : 0.025556
+
+######################################################################
+DATASET: {'source': 'builtin', 'name': 'breast_cancer'}
+######################################################################
+
+Best parameters: {'n_neighbours': 7, 'weights': 'uniform', 'distance_metric': 'manhattan'}
+
+============================================================
+CROSS-VALIDATION RESULTS
+============================================================
+macro_f1                      : 0.966976 ± 0.018175
+macro_recall                  : 0.963983 ± 0.018200
+macro_sensitivity             : 0.963983 ± 0.018200
+macro_roc_auc                 : 0.984547 ± 0.007814
+cross_entropy                 : 0.309817 ± 0.130482
+brier                         : 0.056784 ± 0.022523
+ece                           : 0.036107 ± 0.009207
+
+============================================================
+FINAL TEST SET RESULTS
+============================================================
+macro_f1                      : 0.971277
+macro_recall                  : 0.964286
+macro_sensitivity             : 0.964286
+macro_roc_auc                 : 0.982143
+cross_entropy                 : 0.311530
+brier                         : 0.056570
+ece                           : 0.042607
+
+######################################################################
+DATASET: {'source': 'csv', 'filepath': WindowsPath('C:/Users/kolia/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/LZSCC.461 Test/tests/data/agaricus-lepiota.data'), 'target_column': 0, 'header': None}
+######################################################################
+
+Best parameters: {'n_neighbours': 3, 'weights': 'uniform', 'distance_metric': 'euclidean'}
+
+============================================================
+CROSS-VALIDATION RESULTS
+============================================================
+macro_f1                      : 1.000000 ± 0.000000
+macro_recall                  : 1.000000 ± 0.000000
+macro_sensitivity             : 1.000000 ± 0.000000
+macro_roc_auc                 : 1.000000 ± 0.000000
+cross_entropy                 : 0.000437 ± 0.000318
+brier                         : 0.000239 ± 0.000174
+ece                           : 0.000359 ± 0.000262
+
+============================================================
+FINAL TEST SET RESULTS
+============================================================
+macro_f1                      : 1.000000
+macro_recall                  : 1.000000
+macro_sensitivity             : 1.000000
+macro_roc_auc                 : 1.000000
+cross_entropy                 : -0.000000
+brier                         : 0.000000
+ece                           : 0.000000
+
+######################################################################
+DATASET: {'source': 'csv', 'filepath': WindowsPath('C:/Users/kolia/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/LZSCC.461 Test/tests/data/zoo.csv'), 'target_column': 'class_type', 'header': 0, 'encode_features': True, 'drop_columns': ['animal_name']}
+######################################################################
+
+Best parameters: {'n_neighbours': 5, 'weights': 'distance', 'distance_metric': 'manhattan'}
+C:\Users\kolia\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sklearn\metrics\_ranking.py:424: UndefinedMetricWarning: Only one class is present in y_true. ROC AUC score is not defined in that case.
+  warnings.warn(
+C:\Users\kolia\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sklearn\metrics\_ranking.py:424: UndefinedMetricWarning: Only one class is present in y_true. ROC AUC score is not defined in that case.
+  warnings.warn(
+C:\Users\kolia\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sklearn\metrics\_ranking.py:424: UndefinedMetricWarning: Only one class is present in y_true. ROC AUC score is not defined in that case.
+  warnings.warn(
+C:\Users\kolia\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sklearn\metrics\_ranking.py:424: UndefinedMetricWarning: Only one class is present in y_true. ROC AUC score is not defined in that case.
+  warnings.warn(
+C:\Users\kolia\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sklearn\metrics\_ranking.py:424: UndefinedMetricWarning: Only one class is present in y_true. ROC AUC score is not defined in that case.
+  warnings.warn(
+C:\Users\kolia\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sklearn\metrics\_ranking.py:424: UndefinedMetricWarning: Only one class is present in y_true. ROC AUC score is not defined in that case.
+  warnings.warn(
+C:\Users\kolia\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sklearn\metrics\_ranking.py:424: UndefinedMetricWarning: Only one class is present in y_true. ROC AUC score is not defined in that case.
+  warnings.warn(
+C:\Users\kolia\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sklearn\metrics\_ranking.py:424: UndefinedMetricWarning: Only one class is present in y_true. ROC AUC score is not defined in that case.
+  warnings.warn(
+
+============================================================
+CROSS-VALIDATION RESULTS
+============================================================
+macro_f1                      : 0.924127 ± 0.121195
+macro_recall                  : 0.930000 ± 0.097980
+macro_sensitivity             : 0.930000 ± 0.097980
+macro_roc_auc                 : nan ± nan
+cross_entropy                 : 0.130335 ± 0.104772
+brier                         : 0.078937 ± 0.074209
+ece                           : 0.071412 ± 0.036214
+
+============================================================
+FINAL TEST SET RESULTS
+============================================================
+macro_f1                      : 1.000000
+macro_recall                  : 1.000000
+macro_sensitivity             : 1.000000
+macro_roc_auc                 : 1.000000
+cross_entropy                 : 0.038969
+brier                         : 0.017331
+ece                           : 0.031381
+
+
+package:
+
+################################################################################
+DATASET CONFIGURATION
+{'source': 'builtin', 'name': 'iris'}
+################################################################################
+
+Best parameters:
+Best parameters: {'n_neighbours': 3, 'weights': 'uniform', 'distance_metric': 'euclidean'}
+
+============================================================
+CROSS-VALIDATION RESULTS
+============================================================
+macro_f1                      : 0.966536 ± 0.016732
+macro_recall                  : 0.966667 ± 0.016667
+macro_sensitivity             : 0.966667 ± 0.016667
+macro_roc_auc                 : 0.978125 ± 0.016845
+cross_entropy                 : 0.740477 ± 0.544824
+brier                         : 0.079630 ± 0.030203
+ece                           : 0.052778 ± 0.023895
+
+============================================================
+FINAL TEST SET RESULTS
+============================================================
+macro_f1                      : 0.932660
+macro_recall                  : 0.933333
+macro_sensitivity             : 0.933333
+macro_roc_auc                 : 0.993333
+cross_entropy                 : 0.113787
+brier                         : 0.081481
+ece                           : 0.011111
+
+################################################################################
+DATASET CONFIGURATION
+{'source': 'builtin', 'name': 'wine'}
+################################################################################
+
+Best parameters:
+Best parameters: {'n_neighbours': 7, 'weights': 'uniform', 'distance_metric': 'manhattan'}
+
+============================================================
+CROSS-VALIDATION RESULTS
+============================================================
+macro_f1                      : 0.978877 ± 0.017279
+macro_recall                  : 0.982323 ± 0.014462
+macro_sensitivity             : 0.982323 ± 0.014462
+macro_roc_auc                 : 0.999270 ± 0.001459
+cross_entropy                 : 0.089676 ± 0.021606
+brier                         : 0.052347 ± 0.012820
+ece                           : 0.040007 ± 0.027789
+
+============================================================
+FINAL TEST SET RESULTS
+============================================================
+macro_f1                      : 1.000000
+macro_recall                  : 1.000000
+macro_sensitivity             : 1.000000
+macro_roc_auc                 : 1.000000
+cross_entropy                 : 0.069276
+brier                         : 0.030612
+ece                           : 0.059524
+
+################################################################################
+DATASET CONFIGURATION
+{'source': 'builtin', 'name': 'digits'}
+################################################################################
+
+Best parameters:
+Best parameters: {'n_neighbours': 5, 'weights': 'distance', 'distance_metric': 'euclidean'}
+
+============================================================
+CROSS-VALIDATION RESULTS
+============================================================
+macro_f1                      : 0.977642 ± 0.009790
+macro_recall                  : 0.977729 ± 0.009764
+macro_sensitivity             : 0.977729 ± 0.009764
+macro_roc_auc                 : 0.997199 ± 0.001497
+cross_entropy                 : 0.195958 ± 0.076652
+brier                         : 0.043313 ± 0.009314
+ece                           : 0.028397 ± 0.008154
+
+============================================================
+FINAL TEST SET RESULTS
+============================================================
+macro_f1                      : 0.966143
+macro_recall                  : 0.966424
+macro_sensitivity             : 0.966424
+macro_roc_auc                 : 0.995006
+cross_entropy                 : 0.282578
+brier                         : 0.047334
+ece                           : 0.026812
+
+################################################################################
+DATASET CONFIGURATION
+{'source': 'builtin', 'name': 'breast_cancer'}
+################################################################################
+
+Best parameters:
+Best parameters: {'n_neighbours': 3, 'weights': 'uniform', 'distance_metric': 'manhattan'}
+
+============================================================
+CROSS-VALIDATION RESULTS
+============================================================
+macro_f1                      : 0.969288 ± 0.014177
+macro_recall                  : 0.966512 ± 0.014334
+macro_sensitivity             : 0.966512 ± 0.014334
+macro_roc_auc                 : 0.979670 ± 0.018951
+cross_entropy                 : 0.463640 ± 0.451577
+brier                         : 0.055678 ± 0.030399
+ece                           : 0.030769 ± 0.020276
+
+============================================================
+FINAL TEST SET RESULTS
+============================================================
+macro_f1                      : 0.961911
+macro_recall                  : 0.957341
+macro_sensitivity             : 0.957341
+macro_roc_auc                 : 0.971396
+cross_entropy                 : 0.536039
+brier                         : 0.068226
+ece                           : 0.032164
+
+################################################################################
+DATASET CONFIGURATION
+{'source': 'csv', 'filepath': WindowsPath('C:/Users/kolia/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/LZSCC.461 Test/tests/data/agaricus-lepiota.data'), 'target_column': 0, 'header': None}
+################################################################################
+
+Best parameters:
+Best parameters: {'n_neighbours': 3, 'weights': 'distance', 'distance_metric': 'manhattan'}
+
+============================================================
+CROSS-VALIDATION RESULTS
+============================================================
+macro_f1                      : 1.000000 ± 0.000000
+macro_recall                  : 1.000000 ± 0.000000
+macro_sensitivity             : 1.000000 ± 0.000000
+macro_roc_auc                 : 1.000000 ± 0.000000
+cross_entropy                 : 0.000175 ± 0.000350
+brier                         : 0.000081 ± 0.000162
+ece                           : 0.000150 ± 0.000300
+
+============================================================
+FINAL TEST SET RESULTS
+============================================================
+macro_f1                      : 1.000000
+macro_recall                  : 1.000000
+macro_sensitivity             : 1.000000
+macro_roc_auc                 : 1.000000
+cross_entropy                 : -0.000000
+brier                         : 0.000000
+ece                           : 0.000000
+
+################################################################################
+DATASET CONFIGURATION
+{'source': 'csv', 'filepath': WindowsPath('C:/Users/kolia/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/LZSCC.461 Test/tests/data/zoo.csv'), 'target_column': 'class_type', 'header': 0, 'encode_features': True, 'drop_columns': ['animal_name']}
+################################################################################
+C:\Users\kolia\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sklearn\model_selection\_split.py:811: UserWarning: The least populated class in y has only 3 members, which is less than n_splits=5.
+  warnings.warn(
+
+Best parameters:
+Best parameters: {'n_neighbours': 13, 'weights': 'distance', 'distance_metric': 'manhattan'}
+C:\Users\kolia\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sklearn\model_selection\_split.py:811: UserWarning: The least populated class in y has only 3 members, which is less than n_splits=5.
+  warnings.warn(
+C:\Users\kolia\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sklearn\metrics\_ranking.py:424: UndefinedMetricWarning: Only one class is present in y_true. ROC AUC score is not defined in that case.
+  warnings.warn(
+C:\Users\kolia\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sklearn\metrics\_ranking.py:424: UndefinedMetricWarning: Only one class is present in y_true. ROC AUC score is not defined in that case.
+  warnings.warn(
+C:\Users\kolia\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\sklearn\metrics\_ranking.py:424: UndefinedMetricWarning: Only one class is present in y_true. ROC AUC score is not defined in that case.
+  warnings.warn(
+
+============================================================
+CROSS-VALIDATION RESULTS
+============================================================
+macro_f1                      : 0.849569 ± 0.154634
+macro_recall                  : 0.871429 ± 0.123810
+macro_sensitivity             : 0.871429 ± 0.123810
+macro_roc_auc                 : 0.995238 ± 0.004762
+cross_entropy                 : 0.230309 ± 0.070992
+brier                         : 0.117114 ± 0.045496
+ece                           : 0.115210 ± 0.034631
+
+============================================================
+FINAL TEST SET RESULTS
+============================================================
+macro_f1                      : 1.000000
+macro_recall                  : 1.000000
+macro_sensitivity             : 1.000000
+macro_roc_auc                 : 1.000000
+cross_entropy                 : 0.148487
+brier                         : 0.064417
+ece                           : 0.110333

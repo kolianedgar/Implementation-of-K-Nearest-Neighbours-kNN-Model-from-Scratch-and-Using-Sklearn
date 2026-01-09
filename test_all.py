@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
+from pathlib import Path
 
 from knn.data_loader import (
     load_dataset,
@@ -19,12 +20,33 @@ from knn.reporting import (
 )
 
 # -------------------------------------------------
+# Paths
+# -------------------------------------------------
+PROJECT_ROOT = Path(__file__).resolve().parents[0]
+DATA_DIR = PROJECT_ROOT / "tests" / "data"
+
+# -------------------------------------------------
 # Dataset selection
 # -------------------------------------------------
 DATASETS = [
     {"source": "builtin", "name": "iris"},
-    # {"source": "builtin", "name": "wine"},
-    # {"source": "builtin", "name": "digits"},
+    {"source": "builtin", "name": "wine"},
+    {"source": "builtin", "name": "digits"},
+    {"source": "builtin", "name": "breast_cancer"},
+    {
+        "source": "csv",
+        "filepath": DATA_DIR / "agaricus-lepiota.data",
+        "target_column": 0,
+        "header": None,
+    },
+    {
+        "source": "csv",
+        "filepath": DATA_DIR / "zoo.csv",
+        "target_column": "class_type",
+        "header": 0,
+        "encode_features": True,
+        "drop_columns": ["animal_name"],
+    },
     # {"source": "csv", "filepath": "tests/data/mydata.csv", "target_column": "label"},
 ]
 
