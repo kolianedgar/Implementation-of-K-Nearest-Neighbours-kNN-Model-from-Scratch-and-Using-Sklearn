@@ -1,6 +1,8 @@
-import numpy as np
+import time
+
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from pathlib import Path
 
 from knn.data_loader import (
     load_dataset,
@@ -20,6 +22,12 @@ from knn.reporting import (
     print_cv_results,
     print_test_results,
 )
+
+# -------------------------------------------------
+# Paths
+# -------------------------------------------------
+PROJECT_ROOT = Path(__file__).resolve().parents[0]
+DATA_DIR = PROJECT_ROOT / "tests" / "data"
 
 # -------------------------------------------------
 # Dataset selection
@@ -55,7 +63,10 @@ for ds in DATASETS:
     # -------------------------------------------------
     # Load dataset
     # -------------------------------------------------
+    Time_load = time.time()
     X, y = load_dataset(**ds)
+
+    print(f"\nLoading the dataset took {time.time() - Time_load} seconds.")
 
     # -------------------------------------------------
     # Train / test split
@@ -78,6 +89,9 @@ for ds in DATASETS:
     # -------------------------------------------------
     # Hyperparameter tuning (TRAINING SET ONLY)
     # -------------------------------------------------
+
+    Time_tuning = time.time()
+
     best_params = grid_search_knn(
         X=X_train,
         y=y_train,
@@ -92,6 +106,8 @@ for ds in DATASETS:
     print("\nBest parameters (custom KNN):")
     print(best_params)
 
+    print(f"\nHyperparameter tuning took {time.time() - Time_tuning} seconds.")
+
     # -------------------------------------------------
     # Model factory using best hyperparameters
     # -------------------------------------------------
@@ -105,6 +121,9 @@ for ds in DATASETS:
     # -------------------------------------------------
     # Cross-validation with best model (TRAINING SET)
     # -------------------------------------------------
+
+    Time_cv = time.time()
+
     cv_results = cross_validate_knn(
         X=X_train,
         y=y_train,
@@ -117,9 +136,13 @@ for ds in DATASETS:
         title="CROSS-VALIDATION RESULTS (CUSTOM KNN)",
     )
 
+    print(f"\nCross-validation took {time.time() - Time_cv} seconds.")
+
     # -------------------------------------------------
     # Final test set evaluation
     # -------------------------------------------------
+    
+    Time_testing = time.time()
     final_model = model_factory()
     final_model.fit(X_train, y_train)
 
@@ -130,3 +153,5 @@ for ds in DATASETS:
     )
 
     print_test_results(test_results)
+
+    print(f"\nTesting the dataset took {time.time() - Time_testing} seconds.")
