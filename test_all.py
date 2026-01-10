@@ -26,9 +26,24 @@ from knn.reporting import (
 # -------------------------------------------------
 DATASETS = [
     {"source": "builtin", "name": "iris"},
-    # {"source": "builtin", "name": "wine"},
-    # {"source": "builtin", "name": "digits"},
-    # {"source": "csv", "filepath": "tests/data/mydata.csv", "target_column": "label"},
+    {"source": "builtin", "name": "iris"},
+    {"source": "builtin", "name": "wine"},
+    {"source": "builtin", "name": "digits"},
+    {"source": "builtin", "name": "breast_cancer"},
+    {
+        "source": "csv",
+        "filepath": DATA_DIR / "agaricus-lepiota.data",
+        "target_column": 0,
+        "header": None,
+    },
+    {
+        "source": "csv",
+        "filepath": DATA_DIR / "zoo.csv",
+        "target_column": "class_type",
+        "header": 0,
+        "encode_features": True,
+        "drop_columns": ["animal_name"],
+    },
 ]
 
 for ds in DATASETS:
