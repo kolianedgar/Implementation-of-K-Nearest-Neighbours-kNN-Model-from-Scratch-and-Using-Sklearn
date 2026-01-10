@@ -1,0 +1,5 @@
+"metric","statistic_V","p_value"
+"data_load",0,1
+"hyperparameter_tuning",14,0.28125
+"cv",13,0.34375
+"test",15,0.21875
