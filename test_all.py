@@ -4,6 +4,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from pathlib import Path
 
+from utils_memory import *
+
 from knn.data_loader import (
     load_dataset,
 )
@@ -33,7 +35,6 @@ DATA_DIR = PROJECT_ROOT / "tests" / "data"
 # Dataset selection
 # -------------------------------------------------
 DATASETS = [
-    {"source": "builtin", "name": "iris"},
     {"source": "builtin", "name": "iris"},
     {"source": "builtin", "name": "wine"},
     {"source": "builtin", "name": "digits"},
@@ -142,9 +143,13 @@ for ds in DATASETS:
     # Final test set evaluation
     # -------------------------------------------------
     
-    Time_testing = time.time()
     final_model = model_factory()
-    final_model.fit(X_train, y_train)
+
+    ram_mb = measure_fit_ram_mb(final_model, X_train, y_train)
+
+    print(f"Training RAM usage: {ram_mb} MB")
+
+    Time_testing = time.time()
 
     test_results = evaluate_on_dataset(
         model=final_model,
