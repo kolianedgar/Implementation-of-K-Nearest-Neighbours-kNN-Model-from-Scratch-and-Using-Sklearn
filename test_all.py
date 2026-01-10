@@ -5,6 +5,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
 from pathlib import Path
 
+from utils_memory import *
+
 from knn.data_loader import (
     load_dataset,
 )
@@ -128,9 +130,12 @@ for ds in DATASETS:
     # Final test set evaluation
     # -------------------------------------------------
 
-    Time_test = time.time()
-
+    ram_mb = measure_fit_ram_mb(best_model, X_train, y_train)
+    print(f"Training RAM usage: {ram_mb} MB")
+    
     best_model.fit(X_train, y_train)
+
+    Time_test = time.time()
 
     test_results = evaluate_on_dataset(
         model=best_model,
