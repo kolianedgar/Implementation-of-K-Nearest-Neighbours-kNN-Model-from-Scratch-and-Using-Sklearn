@@ -20,16 +20,49 @@ package_ram <- df_package$fit_ram_mb
 stopifnot(length(own_ram) == length(package_ram))
 
 # -------------------------------------------------
-# Wilcoxon signed-rank test (paired)
+# Monte Carlo paired permutation test
+# -------------------------------------------------
+monte_carlo_paired_permutation <- function(
+    diffs,
+    statistic = mean,
+    n_perm = 100000,
+    alternative = "less",
+    seed = 42
+) {
+  set.seed(seed)
+  
+  observed <- statistic(diffs)
+  n <- length(diffs)
+  
+  perm_stats <- replicate(
+    n_perm,
+    statistic(diffs * sample(c(-1, 1), n, replace = TRUE))
+  )
+  
+  p_value <- switch(
+    alternative,
+    less = mean(perm_stats <= observed),
+    greater = mean(perm_stats >= observed),
+    two.sided = mean(abs(perm_stats) >= abs(observed))
+  )
+  
+  list(
+    statistic = observed,
+    p_value = p_value
+  )
+}
+
+# -------------------------------------------------
+# Run test
 # -------------------------------------------------
 # H1: package uses LESS RAM than own
-wilcox_res <- wilcox.test(
-  x = package_ram,
-  y = own_ram,
-  paired = TRUE,
-  alternative = "less",
-  exact = FALSE,     # correct for n = 240
-  correct = FALSE    # no continuity correction
+diffs_ram <- package_ram - own_ram
+
+perm_result <- monte_carlo_paired_permutation(
+  diffs = diffs_ram,
+  statistic = mean,
+  n_perm = 100000,
+  alternative = "less"
 )
 
 # -------------------------------------------------
@@ -37,8 +70,8 @@ wilcox_res <- wilcox.test(
 # -------------------------------------------------
 results_df <- data.frame(
   metric = "fit_ram_mb",
-  statistic = wilcox_res$statistic,
-  p_value = wilcox_res$p.value
+  statistic = perm_result$statistic,
+  p_value = perm_result$p_value
 )
 
 print(results_df)
@@ -48,7 +81,7 @@ print(results_df)
 # -------------------------------------------------
 write.csv(
   results_df,
-  file = "knn_wilcoxon_memory.csv",
+  file = "knn_monte_carlo_permutation_memory.csv",
   row.names = FALSE
 )
 

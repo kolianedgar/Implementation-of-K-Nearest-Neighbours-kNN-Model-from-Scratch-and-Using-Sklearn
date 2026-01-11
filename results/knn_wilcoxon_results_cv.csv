@@ -1,8 +1,0 @@
-"metric","statistic_V","p_value"
-"f1",6,0.705180724186717
-"recall",5,0.79075388327659
-"sensitivity",5,0.79075388327659
-"roc_auc",0,0.97769514098753
-"cross_entropy",7,0.78125
-"brier",11,0.5
-"ece",13,0.34375
