@@ -1,5 +1,7 @@
 import time
+import pandas as pd
 
+from pathlib import Path
 from itertools import product
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -17,15 +19,38 @@ from knn.metrics import (
     multiclass_brier_score,
     expected_calibration_error,
 )
-from knn.reporting import print_cv_results, print_test_results
+
+# -------------------------------------------------
+# Paths
+# -------------------------------------------------
+PROJECT_ROOT = Path(__file__).resolve().parents[0]
+DATA_DIR = PROJECT_ROOT / "tests" / "data"
 
 # -------------------------------------------------
 # Dataset selection
 # -------------------------------------------------
 DATASETS = [
     {"source": "builtin", "name": "iris"},
+    {"source": "builtin", "name": "wine"},
+    {"source": "builtin", "name": "digits"},
+    {"source": "builtin", "name": "breast_cancer"},
+    {
+        "source": "csv",
+        "filepath": DATA_DIR / "agaricus-lepiota.data",
+        "target_column": 0,
+        "header": None,
+    },
+    {
+        "source": "csv",
+        "filepath": DATA_DIR / "zoo.csv",
+        "target_column": "class_type",
+        "header": 0,
+        "encode_features": True,
+        "drop_columns": ["animal_name"],
+    },
     # {"source": "builtin", "name": "wine"},
     # {"source": "builtin", "name": "digits"},
+    # {"source": "csv", "filepath": "data/mydata.csv", "target_column": "label"},
 ]
 
 # -------------------------------------------------
@@ -38,15 +63,11 @@ PARAM_GRID = {
 }
 
 # -------------------------------------------------
-# Storage for later export
+# Storage
 # -------------------------------------------------
-all_results = []
+rows = []
 
 for ds in DATASETS:
-    print("\n" + "#" * 80)
-    print("DATASET:", ds)
-    print("#" * 80)
-
     # -------------------------------
     # Dataset loading (TIMED)
     # -------------------------------
@@ -73,22 +94,13 @@ for ds in DATASETS:
     X_test = scaler.transform(X_test)
 
     # -------------------------------
-    # Exhaustive hyperparameter loop
+    # Exhaustive grid loop
     # -------------------------------
     for n_neighbors, weights, metric in product(
         PARAM_GRID["n_neighbours"],
         PARAM_GRID["weights"],
         PARAM_GRID["distance_metric"],
     ):
-        print("\n" + "-" * 80)
-        print(
-            f"PARAMETERS → "
-            f"n_neighbours={n_neighbors}, "
-            f"weights={weights}, "
-            f"distance_metric={metric}"
-        )
-        print("-" * 80)
-
         # ---------------------------
         # Cross-validation (TIMED)
         # ---------------------------
@@ -108,13 +120,10 @@ for ds in DATASETS:
         )
         cv_time = time.perf_counter() - t0
 
-        print_cv_results(cv_results, title="CROSS-VALIDATION RESULTS")
-
         # ---------------------------
         # Training (TIMED + RAM)
         # ---------------------------
         model = model_factory()
-
         t0 = time.perf_counter()
         fit_ram_mb = measure_fit_ram_mb(model, X_train, y_train)
         fit_time = time.perf_counter() - t0
@@ -127,33 +136,24 @@ for ds in DATASETS:
         y_prob = model.predict_prob(X_test)
         test_time = time.perf_counter() - t0
 
-        test_results = {
-            "macro_f1": macro_f1(y_test, y_pred),
-            "macro_recall": macro_recall(y_test, y_pred),
-            "macro_sensitivity": macro_sensitivity(y_test, y_pred),
-            "macro_roc_auc": macro_roc_auc(y_test, y_prob),
-            "cross_entropy": categorical_cross_entropy(y_test, y_prob),
-            "brier": multiclass_brier_score(y_test, y_prob),
-            "ece": expected_calibration_error(y_test, y_prob),
+        # ---------------------------
+        # Test metrics
+        # ---------------------------
+        test_metrics = {
+            "test_macro_f1": macro_f1(y_test, y_pred),
+            "test_macro_recall": macro_recall(y_test, y_pred),
+            "test_macro_sensitivity": macro_sensitivity(y_test, y_pred),
+            "test_macro_roc_auc": macro_roc_auc(y_test, y_prob),
+            "test_cross_entropy": categorical_cross_entropy(y_test, y_prob),
+            "test_brier": multiclass_brier_score(y_test, y_prob),
+            "test_ece": expected_calibration_error(y_test, y_prob),
         }
 
-        print_test_results(test_results)
-
         # ---------------------------
-        # Timing & memory report
+        # Single output row
         # ---------------------------
-        print("\nPERFORMANCE METRICS")
-        print(f"Dataset load time     : {dataset_load_time:.6f} s")
-        print(f"Cross-validation time : {cv_time:.6f} s")
-        print(f"Training time (fit)   : {fit_time:.6f} s")
-        print(f"Testing time          : {test_time:.6f} s")
-        print(f"Training RAM usage    : {fit_ram_mb:.4f} MB")
-
-        # ---------------------------
-        # Collect everything
-        # ---------------------------
-        record = {
-            "dataset": ds,
+        row = {
+            "dataset": ds.get("name", ds.get("filepath")),
             "n_neighbours": n_neighbors,
             "weights": weights,
             "distance_metric": metric,
@@ -165,14 +165,17 @@ for ds in DATASETS:
             "fit_ram_mb": fit_ram_mb,
         }
 
-        for name, (mean, std) in cv_results.items():
-            record[f"cv_{name}_mean"] = mean
-            record[f"cv_{name}_std"] = std
+        # CV means only (NO std)
+        for metric_name, (mean, _) in cv_results.items():
+            row[f"cv_{metric_name}"] = mean
 
-        for name, value in test_results.items():
-            record[f"test_{name}"] = value
+        row.update(test_metrics)
+        rows.append(row)
 
-        all_results.append(record)
+# -------------------------------------------------
+# Export to CSV
+# -------------------------------------------------
+df = pd.DataFrame(rows)
+df.to_csv("knn_exhaustive_results.csv", index=False)
 
-print("\nFinished evaluation.")
-print(f"Total configurations evaluated: {len(all_results)}")
+print(f"Exported {len(df)} rows to knn_exhaustive_results.csv")
