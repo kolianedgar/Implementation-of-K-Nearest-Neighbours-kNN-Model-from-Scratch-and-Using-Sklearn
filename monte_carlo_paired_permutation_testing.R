@@ -12,7 +12,7 @@ df_own <- read.csv("own_knn_exhaustive_results.csv", stringsAsFactors = FALSE)
 df_package <- read.csv("sklearn_knn_exhaustive_results.csv", stringsAsFactors = FALSE)
 
 # -------------------------------------------------
-# Extract paired CV performance metrics
+# Extract paired Test performance metrics
 # -------------------------------------------------
 own_metrics <- list(
   macro_f1          = df_own$test_macro_f1,
