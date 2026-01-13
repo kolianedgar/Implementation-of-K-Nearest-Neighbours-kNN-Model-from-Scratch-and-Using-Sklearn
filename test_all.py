@@ -50,13 +50,17 @@ for ds in DATASETS:
     # -------------------------------
     # Dataset loading (TIMED)
     # -------------------------------
+
     t0 = time.perf_counter()
+
     X, y = load_dataset(**ds)
+
     dataset_load_time = time.perf_counter() - t0
 
     # -------------------------------
     # Train / test split
     # -------------------------------
+
     X_train, X_test, y_train, y_test = train_test_split(
         X,
         y,
@@ -68,6 +72,7 @@ for ds in DATASETS:
     # -------------------------------
     # Scaling
     # -------------------------------
+
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
     X_test = scaler.transform(X_test)
@@ -75,6 +80,7 @@ for ds in DATASETS:
     # -------------------------------
     # Exhaustive hyperparameter loop
     # -------------------------------
+
     for n_neighbors, weights, metric in product(
         PARAM_GRID["n_neighbours"],
         PARAM_GRID["weights"],
@@ -92,6 +98,7 @@ for ds in DATASETS:
         # ---------------------------
         # Cross-validation (TIMED)
         # ---------------------------
+
         def model_factory():
             return knn_classifier(
                 n_neighbours=n_neighbors,
@@ -116,15 +123,20 @@ for ds in DATASETS:
         model = model_factory()
 
         t0 = time.perf_counter()
+
         fit_ram_mb = measure_fit_ram_mb(model, X_train, y_train)
+        
         fit_time = time.perf_counter() - t0
 
         # ---------------------------
         # Testing (TIMED)
         # ---------------------------
+
         t0 = time.perf_counter()
+
         y_pred = model.predict(X_test)
         y_prob = model.predict_prob(X_test)
+
         test_time = time.perf_counter() - t0
 
         test_results = {

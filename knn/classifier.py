@@ -108,20 +108,6 @@ class knn_classifier:
             raise ValueError(f"Invalid class index: {index_}")
         return self.classes_[index_]
     
-    def _count_votes(self, neighbour_labels, weights=None):
-        vote_counts = np.zeros(self._n_classes, dtype=float)
-
-        if weights is None:
-            for class_ in neighbour_labels:
-                vote_counts[class_] += 1.0
-        else:
-            if len(weights) != len(neighbour_labels):
-                raise ValueError("weights and neighbour_labels must have the same length")
-            for class_, weight in zip(neighbour_labels, weights):
-                vote_counts[class_] += weight
-
-        return vote_counts
-    
     def _resolve_ties(self, vote_counts, neighbour_labels, neighbour_distances):
         vote_counts = vote_counts.astype(float).copy()
 
@@ -129,11 +115,14 @@ class knn_classifier:
         tied_classes = np.flatnonzero(vote_counts == max_vote)
 
         # no tie → return unchanged votes
+
         if tied_classes.size == 1:
             return vote_counts
 
         # ---- total distance tie-break ----
+
         total_dist = []
+
         for class_ in tied_classes:
             class_mask = neighbour_labels == class_
             total_dist.append(neighbour_distances[class_mask].sum())
@@ -147,7 +136,9 @@ class knn_classifier:
             return vote_counts
 
         # ---- closest neighbour tie-break ----
+
         closest_dist = []
+
         for class_ in best:
             class_mask = neighbour_labels == class_
             closest_dist.append(neighbour_distances[class_mask].min())
@@ -161,7 +152,9 @@ class knn_classifier:
             return vote_counts
 
         # ---- final deterministic fallback ----
+
         vote_counts[np.sort(best)[0]] += 1e-12
+
         return vote_counts
     
     def fit(self, X, y):
@@ -239,7 +232,6 @@ class knn_classifier:
         n_classes = self._n_classes
 
         prob = np.zeros((n_samples, n_classes), dtype=float)
-        eps = 1e-12
 
         for i, x in enumerate(X):
             distances = self._compute_distances(x)
@@ -249,17 +241,18 @@ class knn_classifier:
             neighbour_distances = distances[neighbour_indices]
 
             # ---- raw vote counting ----
+            
             if self.weights.lower() == "uniform":
-                vote_counts = self._count_votes(neighbour_labels)
+                vote_counts = self._majority_vote(neighbour_labels)
 
             elif self.weights.lower() == "distance":
-                weights = 1.0 / (neighbour_distances + eps)
-                vote_counts = self._count_votes(neighbour_labels, weights)
+                vote_counts = self._weighted_vote(neighbour_labels, neighbour_distances)
 
             else:
                 raise ValueError(f"Unknown weighting scheme: {self.weights}")
 
             # ---- tie resolution on RAW votes ----
+
             vote_counts = self._resolve_ties(
                 vote_counts=vote_counts,
                 neighbour_labels=neighbour_labels,
@@ -267,6 +260,7 @@ class knn_classifier:
             )
 
             # ---- normalize exactly once ----
+
             total = vote_counts.sum()
             if total == 0:
                 raise RuntimeError("Vote counts sum to zero after tie resolution")

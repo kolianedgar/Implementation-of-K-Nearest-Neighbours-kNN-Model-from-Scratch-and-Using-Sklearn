@@ -2,6 +2,13 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
+from sklearn.datasets import (
+    load_iris,
+    load_wine,
+    load_digits,
+    load_breast_cancer,
+)
+
 def load_csv_dataset(
     filepath,
     target_column,
@@ -86,13 +93,7 @@ def load_dataset(source, **kwargs):
         return load_csv_dataset(**kwargs)
 
     if source == "builtin":
-        from sklearn.datasets import (
-            load_iris,
-            load_wine,
-            load_digits,
-            load_breast_cancer,
-        )
-
+        
         loaders = {
             "iris": load_iris,
             "wine": load_wine,
