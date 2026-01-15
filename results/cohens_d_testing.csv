@@ -1,8 +1,0 @@
-"Metric","Cohens_d"
-"Macro F1",-0.131822574638056
-"Macro Recall",-0.135868228433775
-"Macro Sensitivity",-0.135868228433775
-"Macro ROC-AUC",0.0522826401507956
-"Cross-Entropy",0.0989366153776012
-"Brier Score",0.0116172576887151
-"Expected Calibration Error",-0.109302496742762
