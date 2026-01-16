@@ -1,5 +1,11 @@
 import pytest
 import numpy as np
+import warnings
+
+def warn(*args, **kwargs):
+    pass
+
+warnings.warn = warn
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
