@@ -30,16 +30,16 @@ DATA_DIR = PROJECT_ROOT / "tests" / "data"
 # Dataset selection
 # -------------------------------------------------
 DATASETS = [
-    {"source": "builtin", "name": "iris"},
-    {"source": "builtin", "name": "wine"},
-    {"source": "builtin", "name": "digits"},
-    {"source": "builtin", "name": "breast_cancer"},
-    {
-        "source": "csv",
-        "filepath": DATA_DIR / "agaricus-lepiota.data",
-        "target_column": 0,
-        "header": None,
-    },
+    # {"source": "builtin", "name": "iris"},
+    # {"source": "builtin", "name": "wine"},
+    # {"source": "builtin", "name": "digits"},
+    # {"source": "builtin", "name": "breast_cancer"},
+    # {
+    #     "source": "csv",
+    #     "filepath": DATA_DIR / "agaricus-lepiota.data",
+    #     "target_column": 0,
+    #     "header": None,
+    # },
     {
         "source": "csv",
         "filepath": DATA_DIR / "zoo.csv",
@@ -48,9 +48,6 @@ DATASETS = [
         "encode_features": True,
         "drop_columns": ["animal_name"],
     },
-    # {"source": "builtin", "name": "wine"},
-    # {"source": "builtin", "name": "digits"},
-    # {"source": "csv", "filepath": "data/mydata.csv", "target_column": "label"},
 ]
 
 # -------------------------------------------------
@@ -81,7 +78,7 @@ for ds in DATASETS:
     X_train, X_test, y_train, y_test = train_test_split(
         X,
         y,
-        test_size=0.2,
+        test_size=0.3,
         stratify=y,
         random_state=42,
     )
@@ -176,6 +173,6 @@ for ds in DATASETS:
 # Export to CSV
 # -------------------------------------------------
 df = pd.DataFrame(rows)
-df.to_csv("knn_exhaustive_results.csv", index=False)
+df.to_csv("zoo/knn_own_results_zoo_70_30.csv", index=False)
 
 print(f"Exported {len(df)} rows to knn_exhaustive_results.csv")

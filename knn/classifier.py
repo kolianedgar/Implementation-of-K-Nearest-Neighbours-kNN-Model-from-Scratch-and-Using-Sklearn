@@ -92,16 +92,18 @@ class knn_classifier:
         return neighbour_idx
 
     def _majority_vote(self, neighbour_labels):
-        return int(np.argmax(np.bincount(neighbour_labels, minlength=self._n_classes)))
+        return np.bincount(
+            neighbour_labels,
+            minlength=self._n_classes
+        ).astype(float)
 
     def _weighted_vote(self, neighbour_labels, neighbour_distances):
-        weights = np.zeros(self._n_classes, dtype=float)
+        vote_counts = np.zeros(self._n_classes, dtype=float)
 
         for label, dist in zip(neighbour_labels, neighbour_distances):
-            weight = 1.0/(dist + 10e-6)
-            weights[label] += weight
+            vote_counts[label] += 1.0 / (dist + 1e-6)
 
-        return np.argmax(weights)
+        return vote_counts
 
     def _decode_label(self, index_):
         if not 0 <= index_ < len(self.classes_):
@@ -109,18 +111,15 @@ class knn_classifier:
         return self.classes_[index_]
     
     def _resolve_ties(self, vote_counts, neighbour_labels, neighbour_distances):
-        vote_counts = vote_counts.astype(float).copy()
+        vote_counts = np.asarray(vote_counts, dtype=float).copy()
 
         max_vote = np.max(vote_counts)
         tied_classes = np.flatnonzero(vote_counts == max_vote)
-
-        # no tie → return unchanged votes
 
         if tied_classes.size == 1:
             return vote_counts
 
         # ---- total distance tie-break ----
-
         total_dist = []
 
         for class_ in tied_classes:
@@ -136,7 +135,6 @@ class knn_classifier:
             return vote_counts
 
         # ---- closest neighbour tie-break ----
-
         closest_dist = []
 
         for class_ in best:
@@ -151,12 +149,11 @@ class knn_classifier:
             vote_counts[best[0]] += 1e-12
             return vote_counts
 
-        # ---- final deterministic fallback ----
-
+        # ---- deterministic fallback ----
         vote_counts[np.sort(best)[0]] += 1e-12
 
         return vote_counts
-    
+
     def fit(self, X, y):
         """
             Store training data and prepare internal structures for KNN classification.
