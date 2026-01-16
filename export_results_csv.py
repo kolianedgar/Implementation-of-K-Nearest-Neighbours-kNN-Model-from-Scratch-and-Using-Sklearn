@@ -1,5 +1,11 @@
 import time
 import pandas as pd
+import warnings
+
+def warn(*args, **kwargs):
+    pass
+
+warnings.warn = warn
 
 from pathlib import Path
 from itertools import product
@@ -23,16 +29,16 @@ DATA_DIR = PROJECT_ROOT / "tests" / "data"
 # Dataset selection
 # -------------------------------------------------
 DATASETS = [
-    {"source": "builtin", "name": "iris"},
-    {"source": "builtin", "name": "wine"},
-    {"source": "builtin", "name": "digits"},
-    {"source": "builtin", "name": "breast_cancer"},
-    {
-        "source": "csv",
-        "filepath": DATA_DIR / "agaricus-lepiota.data",
-        "target_column": 0,
-        "header": None,
-    },
+    # {"source": "builtin", "name": "iris"},
+    # {"source": "builtin", "name": "wine"},
+    # {"source": "builtin", "name": "digits"},
+    # {"source": "builtin", "name": "breast_cancer"},
+    # {
+    #     "source": "csv",
+    #     "filepath": DATA_DIR / "agaricus-lepiota.data",
+    #     "target_column": 0,
+    #     "header": None,
+    # },
     {
         "source": "csv",
         "filepath": DATA_DIR / "zoo.csv",
@@ -172,7 +178,7 @@ def main():
     # Export
     # -------------------------------------------------
     df = pd.DataFrame(rows)
-    df.to_csv("sklearn_knn_exhaustive_results.csv", index=False)
+    df.to_csv("zoo/sklearn_knn_zoo_80_20.csv", index=False)
 
 
 if __name__ == "__main__":

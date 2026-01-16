@@ -2,6 +2,9 @@ import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from knn.metrics import *
+import warnings
+from sklearn.exceptions import UndefinedMetricWarning
+import copy
 
 def grid_search_knn(X, y, param_grid, cv=5):
 
@@ -59,48 +62,60 @@ def cross_validate_knn(
         X_train, X_val = X[train_idx], X[val_idx]
         y_train, y_val = y[train_idx], y[val_idx]
 
-        # -------------------------------------------------
-        # Clone model to avoid leakage across folds
-        # -------------------------------------------------
-        from sklearn.base import clone
-        clf = clone(model)
-
+        # Clone model safely (custom estimator)
+        clf = copy.deepcopy(model)
         clf.fit(X_train, y_train)
 
         y_pred = clf.predict(X_val)
+        y_prob = clf.predict_proba(X_val)
 
-        if hasattr(clf, "predict_proba"):
-            y_prob = clf.predict_proba(X_val)
-        else:
-            y_prob = None
-
-        # -------------------------------------------------
-        # Metrics
-        # -------------------------------------------------
+        # -------------------------------
+        # Metrics per fold
+        # -------------------------------
         metrics["macro_f1"].append(macro_f1(y_val, y_pred))
         metrics["macro_recall"].append(macro_recall(y_val, y_pred))
         metrics["macro_sensitivity"].append(macro_sensitivity(y_val, y_pred))
 
-        if y_prob is not None:
-            metrics["macro_roc_auc"].append(macro_roc_auc(y_val, y_prob))
-            metrics["cross_entropy"].append(
-                categorical_cross_entropy(y_val, y_prob)
+        # Suppress sklearn ROC-AUC warnings locally
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                category=UndefinedMetricWarning
             )
-            metrics["brier"].append(multiclass_brier_score(y_val, y_prob))
-            metrics["ece"].append(expected_calibration_error(y_val, y_prob))
-        else:
-            metrics["macro_roc_auc"].append(np.nan)
-            metrics["cross_entropy"].append(np.nan)
-            metrics["brier"].append(np.nan)
-            metrics["ece"].append(np.nan)
 
-    # -------------------------------------------------
+            metrics["macro_roc_auc"].append(
+                macro_roc_auc(y_val, y_prob)
+            )
+
+        metrics["cross_entropy"].append(
+            categorical_cross_entropy(y_val, y_prob)
+        )
+        metrics["brier"].append(
+            multiclass_brier_score(y_val, y_prob)
+        )
+        metrics["ece"].append(
+            expected_calibration_error(y_val, y_prob)
+        )
+
+    # -------------------------------
     # Aggregate mean ± std
-    # -------------------------------------------------
-    return {
-        metric: (np.nanmean(values), np.nanstd(values))
-        for metric, values in metrics.items()
-    }
+    # -------------------------------
+    results = {}
+
+    for metric, values in metrics.items():
+        values = np.asarray(values, dtype=float)
+
+        if metric == "macro_roc_auc":
+            # STRICT POLICY:
+            # if any fold is invalid → drop metric entirely
+            if np.any(np.isnan(values)):
+                results[metric] = (np.nan, np.nan)
+            else:
+                results[metric] = (values.mean(), values.std())
+        else:
+            results[metric] = (np.nanmean(values), np.nanstd(values))
+
+    return results
 
 def evaluate_on_dataset(model, X, y):
     """
