@@ -1,0 +1,5 @@
+"metric","statistic","p_value"
+"dataset_load_time",820,0.999999999879209
+"cv_time",619,0.997568351774298
+"fit_time",259,0.0215397655370816
+"test_time",402,0.459850751456986

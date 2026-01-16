@@ -1,0 +1,8 @@
+"metric","statistic","p_value"
+"macro_f1",0,1
+"macro_recall",0,1
+"macro_sensitivity",0,1
+"macro_roc_auc",0,1
+"cross_entropy",3.56783491595544e-10,0
+"brier",2.27246736684418e-10,0
+"ece",2.58950685036224e-10,0
