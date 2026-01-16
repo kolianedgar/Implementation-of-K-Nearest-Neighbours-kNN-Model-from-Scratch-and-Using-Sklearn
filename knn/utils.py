@@ -2,6 +2,12 @@ import numpy as np
 from itertools import product
 from .classifier import *
 from .metrics import *
+import warnings
+
+def warn(*args, **kwargs):
+    pass
+
+warnings.warn = warn
 
 def k_fold_split(X, y, n_splits=5, shuffle=True, random_state=42):
     n = len(X)

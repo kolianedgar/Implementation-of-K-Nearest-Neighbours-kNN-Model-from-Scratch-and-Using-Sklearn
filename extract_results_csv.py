@@ -1,5 +1,11 @@
 import time
 import pandas as pd
+import warnings
+
+def warn(*args, **kwargs):
+    pass
+
+warnings.warn = warn
 
 from pathlib import Path
 from itertools import product

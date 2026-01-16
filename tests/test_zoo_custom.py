@@ -1,7 +1,13 @@
 import numpy as np
 import pytest
-from pathlib import Path
+import warnings
 
+def warn(*args, **kwargs):
+    pass
+
+warnings.warn = warn
+
+from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
