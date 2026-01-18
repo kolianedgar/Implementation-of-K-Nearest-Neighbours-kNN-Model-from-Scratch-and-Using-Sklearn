@@ -75,11 +75,32 @@ def load_csv_dataset(
 
 def load_dataset(source, **kwargs):
     """
-    Unified dataset loader.
+        Load a dataset from a specified source.
 
-    Parameters
-    ----------
-    source : {"builtin", "csv"}
+        This function provides a unified interface for loading datasets either
+        from built-in sklearn datasets or from a CSV file.
+
+        Parameters
+        ----------
+        source : {"builtin", "csv"}
+            Source from which to load the dataset.
+        **kwargs
+            Additional keyword arguments passed to the underlying dataset loader.
+            For ``source="builtin"``, this must include ``name`` specifying the
+            dataset to load. For ``source="csv"``, arguments are forwarded to
+            ``load_csv_dataset``.
+
+        Returns
+        -------
+        X : ndarray of shape (n_samples, n_features)
+            Feature matrix.
+        y : ndarray of shape (n_samples,)
+            Target vector.
+
+        Raises
+        ------
+        ValueError
+            If the specified source is not supported.
     """
 
     if source == "csv":

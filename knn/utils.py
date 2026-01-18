@@ -7,6 +7,26 @@ from sklearn.exceptions import UndefinedMetricWarning
 import copy
 
 def grid_search_knn(X, y, param_grid, cv=5):
+    """
+        Perform grid search with cross-validation to select optimal KNN hyperparameters.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Feature matrix.
+        y : array-like of shape (n_samples,)
+            Target labels.
+        param_grid : dict
+            Dictionary specifying hyperparameter search space. Expected keys are
+            'n_neighbours', 'weights', and 'distance_metric'.
+        cv : int, default=5
+            Number of stratified cross-validation folds.
+
+        Returns
+        -------
+        dict
+            Dictionary containing the best hyperparameters found.
+    """
 
     cv_strategy = StratifiedKFold(
         n_splits=cv,
@@ -41,7 +61,27 @@ def cross_validate_knn(
     y,
     cv=5,
 ):
+    """
+        Perform stratified cross-validation for a KNN-based classifier using custom metrics.
 
+        Parameters
+        ----------
+        model : sklearn-compatible classifier
+            A fitted or unfitted classifier implementing fit, predict, and predict_proba.
+        X : array-like of shape (n_samples, n_features)
+            Feature matrix.
+        y : array-like of shape (n_samples,)
+            Target labels.
+        cv : int, default=5
+            Number of stratified cross-validation folds.
+
+        Returns
+        -------
+        dict
+            Dictionary mapping metric names to tuples of (mean, standard deviation)
+            computed across folds.
+    """
+    
     skf = StratifiedKFold(
         n_splits=cv,
         shuffle=True,

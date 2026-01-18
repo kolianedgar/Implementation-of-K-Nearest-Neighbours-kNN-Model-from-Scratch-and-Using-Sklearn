@@ -3,6 +3,24 @@ import pandas as pd
 from sklearn.metrics import roc_auc_score
 
 def macro_recall(y_true, y_pred):
+    """
+        Compute the macro-averaged recall score.
+
+        Recall is computed independently for each class and then averaged,
+        giving equal weight to all classes.
+
+        Parameters
+        ----------
+        y_true : array-like of shape (n_samples,)
+            True class labels.
+        y_pred : array-like of shape (n_samples,)
+            Predicted class labels.
+
+        Returns
+        -------
+        score : float
+            Macro-averaged recall.
+    """
     classes = np.unique(y_true)
     recalls = []
 
@@ -16,6 +34,24 @@ def macro_recall(y_true, y_pred):
 macro_sensitivity = macro_recall
 
 def macro_f1(y_true, y_pred):
+    """
+        Compute the macro-averaged F1 score.
+
+        The F1 score is computed independently for each class and then averaged,
+        giving equal weight to all classes.
+
+        Parameters
+        ----------
+        y_true : array-like of shape (n_samples,)
+            True class labels.
+        y_pred : array-like of shape (n_samples,)
+            Predicted class labels.
+
+        Returns
+        -------
+        score : float
+            Macro-averaged F1 score.
+    """
     classes = np.unique(y_true)
     f1s = []
 
@@ -33,9 +69,22 @@ def macro_f1(y_true, y_pred):
 
 def macro_roc_auc(y_true, y_prob):
     """
-    Robust macro ROC AUC for binary and multiclass classification.
+        Compute the macro-averaged ROC AUC score.
 
-    Returns np.nan if ROC AUC is undefined (e.g. only one class present).
+        Supports binary and multiclass classification using a one-vs-rest
+        strategy. Returns NaN if the score is undefined.
+
+        Parameters
+        ----------
+        y_true : array-like of shape (n_samples,)
+            True class labels.
+        y_prob : array-like of shape (n_samples, n_classes)
+            Predicted class probabilities.
+
+        Returns
+        -------
+        score : float
+            Macro-averaged ROC AUC score, or NaN if undefined.
     """
 
     y_true = np.asarray(y_true)
@@ -67,6 +116,25 @@ def macro_roc_auc(y_true, y_prob):
         return np.nan
 
 def categorical_cross_entropy(y_true, y_prob):
+    """
+    Compute the categorical cross-entropy loss.
+
+    Samples whose true class is not present in the probability output
+    are ignored.
+
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,)
+        True class labels.
+    y_prob : array-like of shape (n_samples, n_classes)
+        Predicted class probabilities.
+
+    Returns
+    -------
+    loss : float
+        Mean categorical cross-entropy, or NaN if undefined.
+    """
+
     eps = 1e-12
     y_true = np.asarray(y_true)
     y_prob = np.asarray(y_prob)
@@ -87,10 +155,23 @@ def categorical_cross_entropy(y_true, y_prob):
 
 def multiclass_brier_score(y_true, y_prob):
     """
-    Robust multiclass Brier score.
+        Compute the multiclass Brier score.
 
-    Ignores samples whose true class is not present
-    in the model's probability output.
+        The score measures the mean squared difference between predicted
+        probabilities and the one-hot encoded true labels. Samples whose
+        true class is not present in the probability output are ignored.
+
+        Parameters
+        ----------
+        y_true : array-like of shape (n_samples,)
+            True class labels.
+        y_prob : array-like of shape (n_samples, n_classes)
+            Predicted class probabilities.
+
+        Returns
+        -------
+        score : float
+            Multiclass Brier score, or NaN if undefined.
     """
 
     y_true = np.asarray(y_true)
@@ -114,6 +195,26 @@ def multiclass_brier_score(y_true, y_prob):
     return np.mean(np.sum((y_prob_valid - y_true_oh) ** 2, axis=1))
 
 def expected_calibration_error(y_true, y_prob, n_bins=10):
+    """
+        Compute the Expected Calibration Error (ECE).
+
+        The ECE measures the difference between confidence and accuracy
+        by partitioning predictions into confidence bins.
+
+        Parameters
+        ----------
+        y_true : array-like of shape (n_samples,)
+            True class labels.
+        y_prob : array-like of shape (n_samples, n_classes)
+            Predicted class probabilities.
+        n_bins : int, default=10
+            Number of confidence bins.
+
+        Returns
+        -------
+        ece : float
+            Expected calibration error.
+    """
     confidences = np.max(y_prob, axis=1)
     predictions = np.argmax(y_prob, axis=1)
     accuracies = predictions == y_true
