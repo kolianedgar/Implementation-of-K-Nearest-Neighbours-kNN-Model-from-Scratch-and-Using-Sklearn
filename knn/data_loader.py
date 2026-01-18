@@ -82,11 +82,39 @@ def load_csv_dataset(
 
 def load_dataset(source, **kwargs):
     """
-    Unified dataset loader.
+        Load a dataset from a specified source.
 
-    Parameters
-    ----------
-    source : {"builtin", "csv"}
+        Provides a unified interface for loading datasets either from
+        built-in sources or from external CSV files.
+
+        Parameters
+        ----------
+        source : {'builtin', 'csv'}
+            Dataset source. If 'builtin', a scikit-learn built-in dataset
+            is loaded. If 'csv', the dataset is loaded from a CSV file.
+
+        **kwargs
+            Additional keyword arguments controlling dataset loading.
+
+            For ``source='builtin'``:
+                name : {'iris', 'wine', 'digits', 'breast_cancer'}
+                    Name of the built-in dataset to load.
+
+            For ``source='csv'``:
+                Passed directly to ``load_csv_dataset``.
+
+        Returns
+        -------
+        X : ndarray of shape (n_samples, n_features)
+            Feature matrix.
+
+        y : ndarray of shape (n_samples,)
+            Target labels.
+
+        Raises
+        ------
+        ValueError
+            If an unknown dataset source or dataset name is specified.
     """
 
     if source == "csv":

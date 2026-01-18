@@ -3,6 +3,25 @@ from sklearn.metrics import roc_auc_score
 from .classifier import *
 
 def macro_recall(y_true, y_pred):
+    """
+        Compute the macro-averaged recall score.
+
+        Recall is computed independently for each class and then averaged,
+        giving equal weight to all classes regardless of their support.
+
+        Parameters
+        ----------
+        y_true : array-like of shape (n_samples,)
+            True class labels.
+
+        y_pred : array-like of shape (n_samples,)
+            Predicted class labels.
+
+        Returns
+        -------
+        score : float
+            Macro-averaged recall.
+    """
     classes = np.unique(y_true)
     recalls = []
 
@@ -16,6 +35,26 @@ def macro_recall(y_true, y_pred):
 macro_sensitivity = macro_recall
 
 def macro_f1(y_true, y_pred):
+    """
+        Compute the macro-averaged F1 score.
+
+        The F1 score is computed independently for each class as the
+        harmonic mean of precision and recall, and then averaged across
+        all classes with equal weight.
+
+        Parameters
+        ----------
+        y_true : array-like of shape (n_samples,)
+            True class labels.
+
+        y_pred : array-like of shape (n_samples,)
+            Predicted class labels.
+
+        Returns
+        -------
+        score : float
+            Macro-averaged F1 score.
+    """
     classes = np.unique(y_true)
     f1s = []
 
@@ -33,9 +72,28 @@ def macro_f1(y_true, y_pred):
 
 def macro_roc_auc(y_true, y_prob):
     """
-    Robust macro ROC AUC for binary and multiclass classification.
+        Compute the macro-averaged ROC AUC score.
 
-    Returns np.nan if ROC AUC is undefined (e.g. only one class present).
+        Supports both binary and multiclass classification using a
+        one-vs-rest strategy. The ROC AUC is computed independently
+        for each class and then averaged with equal weight.
+
+        If the ROC AUC score is undefined (e.g. when only one class
+        is present in ``y_true`` or label indices are incompatible
+        with ``y_prob``), ``np.nan`` is returned.
+
+        Parameters
+        ----------
+        y_true : array-like of shape (n_samples,)
+            True class labels.
+
+        y_prob : array-like of shape (n_samples, n_classes)
+            Predicted class probabilities.
+
+        Returns
+        -------
+        score : float
+            Macro-averaged ROC AUC score, or ``np.nan`` if undefined.
     """
 
     y_true = np.asarray(y_true)
@@ -67,6 +125,27 @@ def macro_roc_auc(y_true, y_prob):
         return np.nan
 
 def categorical_cross_entropy(y_true, y_prob):
+    """
+        Compute the categorical cross-entropy loss.
+
+        Measures the negative log-likelihood of the true class under the
+        predicted class probability distribution. Samples whose true
+        labels are outside the valid class range are ignored.
+
+        Parameters
+        ----------
+        y_true : array-like of shape (n_samples,)
+            True class labels.
+
+        y_prob : array-like of shape (n_samples, n_classes)
+            Predicted class probabilities.
+
+        Returns
+        -------
+        loss : float
+            Mean categorical cross-entropy loss, or ``np.nan`` if no
+            valid samples are available.
+    """
     eps = 1e-12
     y_true = np.asarray(y_true)
     y_prob = np.asarray(y_prob)
@@ -87,10 +166,28 @@ def categorical_cross_entropy(y_true, y_prob):
 
 def multiclass_brier_score(y_true, y_prob):
     """
-    Robust multiclass Brier score.
+        Compute the multiclass Brier score.
 
-    Ignores samples whose true class is not present
-    in the model's probability output.
+        Measures the mean squared error between predicted class
+        probabilities and the one-hot encoded true labels. Samples
+        whose true class is not present in the probability output
+        are ignored, making the metric robust to missing classes
+        in cross-validation folds.
+
+        Parameters
+        ----------
+        y_true : array-like of shape (n_samples,)
+            True class labels.
+
+        y_prob : array-like of shape (n_samples, n_classes)
+            Predicted class probabilities.
+
+        Returns
+        -------
+        score : float
+            Multiclass Brier score. Lower values indicate better
+            calibrated probability estimates. Returns ``np.nan``
+            if no valid samples are available.
     """
 
     y_true = np.asarray(y_true)
@@ -114,6 +211,31 @@ def multiclass_brier_score(y_true, y_prob):
     return np.mean(np.sum((y_prob_valid - y_true_oh) ** 2, axis=1))
 
 def expected_calibration_error(y_true, y_prob, n_bins=10):
+    """
+        Compute the Expected Calibration Error (ECE).
+
+        Measures the discrepancy between predicted confidence and
+        empirical accuracy by partitioning predictions into confidence
+        bins and computing a weighted average of the absolute differences
+        between accuracy and confidence within each bin.
+
+        Parameters
+        ----------
+        y_true : array-like of shape (n_samples,)
+            True class labels.
+
+        y_prob : array-like of shape (n_samples, n_classes)
+            Predicted class probabilities.
+
+        n_bins : int, default=10
+            Number of confidence bins used to estimate calibration.
+
+        Returns
+        -------
+        ece : float
+            Expected calibration error. Lower values indicate better
+            calibrated predictions.
+    """
     confidences = np.max(y_prob, axis=1)
     predictions = np.argmax(y_prob, axis=1)
     accuracies = predictions == y_true

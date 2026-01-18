@@ -94,8 +94,6 @@ def test_custom_knn_pipeline_execution(dataset_config):
         cv=3,
     )
 
-    model = knn_classifier(**best_params)
-
     cv_results = cross_validate_knn(
         model_factory = lambda: knn_classifier(**best_params),
         X=X_train,
