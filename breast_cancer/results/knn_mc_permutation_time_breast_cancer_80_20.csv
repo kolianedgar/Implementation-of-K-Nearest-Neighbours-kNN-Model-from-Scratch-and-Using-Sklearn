@@ -1,5 +1,5 @@
-metric,statistic,p_value
-dataset_load_time,0.061449586,1
-cv_time,0.016841239,0.99994
-fit_time,0.000318087,0.98618
-test_time,0.001788682,0.98896
+"metric","statistic","p_value"
+"dataset_load_time",0.061449585511582,1
+"cv_time",0.0168412392631581,0.99994
+"fit_time",0.000318087010236923,0.98618
+"test_time",0.00178868157963734,0.98896
