@@ -122,4 +122,13 @@ results <- lapply(names(metric_direction), function(metric) {
 
 results_df <- do.call(rbind, results)
 
+# -------------------------------------------------
+# Export
+# -------------------------------------------------
+write.csv(
+  results_df,
+  file = "results/knn_mc_permuation_cv_iris_70_30.csv",
+  row.names = FALSE
+)
+
 print(results_df)
