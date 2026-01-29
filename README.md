@@ -49,7 +49,7 @@ This ensures conclusions are statistically justified rather than anecdotal.
 
 ---
 
-## 🧪 Datasets
+## 🗄️ Datasets
 
 The following datasets are used throughout the experiments:
 
@@ -64,17 +64,23 @@ These datasets vary in size, dimensionality, and class distribution to test robu
 
 ---
 
-## ▶️ Running the Code
+## ⬇️ Requirements
 
-### Install the project
-
-Dependencies are managed via `pyproject.toml`. Install the project with:
+1. Install the project by clonining the repository
 
 ```bash
-pip install .
+git clone https://github.com/kolianedgar/SCC.461_Report.git
 ```
 
-### Run tests
+2. Install necessary libraries
+
+```bash
+pip install numpy pandas scikit-learn
+```
+
+---
+
+## 🧪 Run tests
 
 ```bash
 pytest
@@ -92,11 +98,7 @@ Results include:
 * Aggregated experimental outputs
 * Statistical test summaries
 
-Detailed outputs can be found in:
-
-```
-Own Implementation/test-output-own.txt
-```
+Detailed outputs can be found in `.csv` files of each dataset within the **Statistical Testing** folder or in the final report.
 
 ---
 
@@ -107,8 +109,3 @@ Own Implementation/test-output-own.txt
 * Applying statistical testing to ML experiments
 * Designing reproducible experimental pipelines
 
----
-
-## 📄 License
-
-This project is licensed under the **MIT License**. See the `LICENSE` file for details.
