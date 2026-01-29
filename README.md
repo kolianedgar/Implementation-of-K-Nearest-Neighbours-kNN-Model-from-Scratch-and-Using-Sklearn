@@ -64,7 +64,7 @@ These datasets vary in size, dimensionality, and class distribution to test robu
 
 ---
 
-## ⬇️ Requirements
+## 🛠️ Setting up the Environment
 
 1. Install the project by clonining the repository
 
