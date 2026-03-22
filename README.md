@@ -43,7 +43,7 @@ To ensure meaningful comparisons, the project applies statistical testing to exp
 * Multiple experimental runs
 * Hypothesis testing for performance differences
 * Comparisons between custom and package-based implementations
-* Analysis across different datasets and values of `k`
+* Analysis across different datasets and various train-test splits
 
 This ensures conclusions are statistically justified rather than anecdotal.
 
